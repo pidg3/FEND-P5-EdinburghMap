@@ -148,8 +148,32 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	font-weight: 700;
 }
 
-.place-list p:hover {
+.place-container {
+	height: auto;
+}
+
+.place-container > .place-name {
+	float: left;
+	max-width: 170px;
+	font-size: 16px;
+	margin: 10px 0 10px 0;
+
+}
+
+.place-container > .place-name:hover {
 	text-decoration: underline;
+	cursor: pointer;
+}
+
+.place-container > .fa-star {
+	font-size: 19px;
+	float: right;
+	margin: 10px 0 10px 0;
+
+}
+
+.place-container > .fa-star:hover {
+	color: grey;
 	cursor: pointer;
 }
 
@@ -181,3 +205,4 @@ Mechanics in main.js
 	position: absolute;
 	top: 528px;
 }
+	
