@@ -1,0 +1,183 @@
+
+/*!
+ * Custom Styles - Edinburgh Map
+ */
+
+/* Z-index tracker:
+
+Top bar: 2
+Menu box: 1
+
+*/
+
+
+html, body, input {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	font-family: 'Raleway', sans-serif;
+	color: #252525;
+	}
+
+/* Top nav/search bar */
+
+.top-bar {
+	height: 48px;
+	width: auto;
+	background-color: white;
+	box-shadow: 0 5px 5px #888888;
+	z-index: 2;
+	position: relative;
+}
+
+.top-bar > .fa-bars { /* Hamburger icon */
+	font-size: 40px;
+	margin: 4px 4px 4px 10px;
+}
+
+.top-bar > .fa-bars:hover {
+	cursor: pointer;	
+}
+
+#map {
+  height: 100%;
+  max-height: calc(100vh - 48px); /* Less height of top bar */
+  clear: both; /* Nothing can float around the map */
+}
+
+.search-container {
+	float: right;
+	padding: 8px 12px;
+	text-align: right;
+}
+
+#search {
+	border-radius: 10px;
+	height: 30px;
+	width: 200px;
+	outline: none;
+	padding: 10px;
+	padding-right: 28px;
+}
+
+.search-container .icon { /* Magnifying glass symbol */
+  position: absolute;
+  right: 22px;
+  top: 14px;
+  color: #4f5b66;
+}
+
+.search-container .icon:hover { /* Magnifying glass symbol */
+	cursor: pointer;
+}
+
+/* Remove delete button from search box
+Credit: http://geektnt.com/how-to-remove-x-from-search-input-field-on-chrome-and-ie.html
+*/
+
+input[type=text]::-ms-clear {  display: none; width : 0; height: 0; } /* Remove delete button from search box */
+input[type=text]::-ms-reveal {  display: none; width : 0; height: 0; }
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration { display: none; }
+
+/* Style infoWindow content */
+
+.info-content * {
+	padding: 5px;
+	margin: 0;
+}
+
+.info-content h4 {
+	font-size: 24px;
+}
+
+.info-content .info-photo {
+	float: left;
+	width: 100px; /* All image sizes pre-set to avoid ugly rendering */
+	height: 100px;
+}
+
+.info-content .info-rating {
+	max-width: 120px;
+	padding: 0 0 0 10px;
+	width: 120px;
+	height: 22px;
+}
+
+.info-content .info-yelp {
+	max-width: 120px;
+	padding: 0 0 0 10px;
+	width: 120px;
+	height: 28px;
+}
+
+.info-content .info-address a {
+	font-size: 11px;
+	color: #252525;
+	text-decoration: none;
+	padding: 0 0 0 10px;
+}
+
+.info-content .info-address a:hover {
+	color: #252525;
+	text-decoration: underline;
+}
+
+/* For scrolling menu itself */
+
+.menu-container {
+	position: absolute;
+	top: -480px; /* Hide off-screen initially */
+}
+
+#menu {
+	z-index: 1;
+	position: relative;
+	background-color: white;
+	margin: 0;
+	width: 200px;
+	max-height: 480px;
+	overflow: hidden;
+	box-shadow: 0 5px 5px #888888;
+	padding: 10px 25px;
+}
+
+.place-type {
+	font-weight: 700;
+}
+
+.place-list p:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+/* For scrolling manu animations
+Mechanics in main.js 
+*/
+
+.animating #menu, .menu-visible #menu {
+	display: block;
+	visibility: visible;
+}
+
+.animating {
+	transition: transform .25s ease-in-out;
+	-webkit-transition: -webkit-transform .25s ease-in-out;
+}
+
+.animating.top {
+	transform: translate3d( 0, 528px, 0 );
+	-webkit-transform: translate3d( 0, 528px, 0 );
+}
+
+.animating.bottom {
+	transform: translate3d( 0, -528px, 0 );
+	-webkit-transform: translate3d( 0, -528px, 0 );
+}
+
+.menu-visible {
+	position: absolute;
+	top: 528px;
+}

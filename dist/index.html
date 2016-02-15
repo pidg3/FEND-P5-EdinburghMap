@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Edinburgh Place Finder</title>
+
+	<link rel="shortcut icon" href="../images/scottish-flag.png">
+
+	<link rel="stylesheet" href="styles/all-styles.min.css"/>
+
+	<!-- Include fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Raleway:400,700" rel="stylesheet" type="text/css"> 
+
+</head>
+
+<body>
+	<div class="menu-container"> <!-- Shown off-screen initially -->
+		<div id="menu">
+			<p data-bind="text: currentSearch" class="place-type"></p>
+			<hr>
+			<div data-bind="foreach: displayList" class="place-list">
+				<p data-bind="text: $data, click: $root.placeClick"></p> <!-- TODO - add clickable -->
+			</div>
+		</div>
+	</div>
+	<div class="top-bar">
+		<i id="toggle-menu" class="fa fa-bars fa-3x"></i>
+
+		<div class="search-container">
+		    <form data-bind="submit: searchBox" id="search-box">
+			    <input type="search" id="search" data-bind="value: searchQuery">
+			    <span data-bind="click: searchBox"class="icon"><i class="fa fa-search"></i></span>
+				<submit>
+		    </form>
+		  </div>
+	</div>
+
+	<div id="map"></div> <!-- Main map holder -->
+
+	<script src="js/all-js.min.js"></script>
+
+
+    <!-- Loads map and calls back container function in main.js
+    Must come last as main.js needs to have loaded to be called back -->	
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKaSn7cGU9ER9KVO63fCTQFOPUnOg1q9U&callback=mapApp&libraries=places">
+    </script>
+
+  
+</body>

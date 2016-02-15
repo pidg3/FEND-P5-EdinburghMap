@@ -1,0 +1,36 @@
+{
+  "name": "P5-EdinburghMap",
+  "homepage": "https://github.com/pidg3/FEND-P5-EdinburghMap",
+  "authors": [
+    "pidg3 <michael.r.pidgeon@gmail.com>"
+  ],
+  "description": "Udacity FEND P5",
+  "main": "index.html",
+  "moduleType": [],
+  "keywords": [
+    "javaScript",
+    "jQuery",
+    "KnockoutJS"
+  ],
+  "license": "None",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.0",
+    "animate.css": "^3.5.1",
+    "knockout": "^3.4.0",
+    "bower": "*",
+    "oauth-signature": "^1.3.1",
+    "font-awesome": "fontawesome#^4.5.0"
+  },
+  "overrides": {
+    "font-awesome": {
+      "main": "css/font-awesome.css"
+    }
+  }
+}

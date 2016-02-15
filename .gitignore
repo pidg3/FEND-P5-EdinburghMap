@@ -1,2 +1,3 @@
 .eslintrc.json
-animateOriginal.css
+.eslintignore
+node_modules
