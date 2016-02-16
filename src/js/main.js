@@ -41,7 +41,9 @@ function mapApp() {
 			'stadiumsarenas': '../images/sports.png'
 		},
 
-		defaultIcon: '../images/other.png'
+		defaultIcon: '../images/other.png',
+
+		favouriteList: []
 
 	};	
 
@@ -81,6 +83,30 @@ function mapApp() {
 				mapView.createMarker(result.businesses[0]);
 			});
 		};
+
+		// favourite places implementation
+
+		self.favourites = ko.observableArray();
+
+		self.favouriteClick = function(name) {
+			var removeIndex = self.favourites().indexOf(name);
+
+			if (removeIndex === -1) {
+				self.favourites().push(name);
+			}
+			else if (removeIndex >= 0) {
+				self.favourites().splice(removeIndex, 1);
+			}
+			else {
+				alert('Issue with favourites functionality');
+			}
+
+			self.favourites(model.favouriteList);
+
+			console.log(self.favourites());
+
+		};
+
 	}
 
 	ko.applyBindings(new appViewModel()); // triggers KO bindings
@@ -114,6 +140,8 @@ function mapApp() {
 		// determine which icon to use based on data in model
 		// have to pass in single Yelp place object
 		createMarker: function(place) {
+
+			console.log(place);
 
 			var currentIcon = '';
 
@@ -201,8 +229,6 @@ function mapApp() {
 		// this avoids issues due to async AJAX request
 		searchName: function(name, callback) {
 
-			console.log(this.commonParameters);
-
 			var nameParameters = {
 				term : name, // search for name passed to searchName
 				limit: 1
@@ -226,8 +252,6 @@ function mapApp() {
 					alert('AJAX request failed.'); // TODO better error handling
 				}
 			};
-
-			console.log(ajaxParameters);
 
 			// Send AJAX query via jQuery library.
 			$.ajax(ajaxParameters); // return to be parsed by other function - API call only here
@@ -280,7 +304,6 @@ function mapApp() {
 
 				var menu = $('#menu');
 
-				console.log(menu);
 				menu.addClass('animating');
 				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
 					menu.addClass('bottom');
@@ -308,7 +331,6 @@ function mapApp() {
 				var menu = $('#menu');
 
 				if (menu.hasClass('menu-visible')) {
-					console.log('Menu already open'); // add CSSanimate functionality? shake?
 					menu.addClass('animated pulse'); // trigger animation
 					menu.on(interfaceView.animationEnd, function() {
 						menu

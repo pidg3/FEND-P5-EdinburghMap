@@ -169,8 +169,13 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	font-size: 19px;
 	float: right;
 	margin: 10px 0 10px 0;
-
 }
+
+.star-yellow {
+	color: yellow;
+}
+
+
 
 .place-container > .fa-star:hover {
 	color: grey;
@@ -205,4 +210,12 @@ Mechanics in main.js
 	position: absolute;
 	top: 528px;
 }
-	
+
+.favourites-temp { /* TODO - remove */
+	float: right;
+	position: absolute;
+	z-index: 3;
+	right: 40px;
+	top: 50px;
+
+}

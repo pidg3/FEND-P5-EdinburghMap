@@ -25,7 +25,7 @@
 			<hr>
 			<div data-bind="foreach: displayList">
 				<div class="place-container">
-					<div data-bind="text: $data, click: $root.placeClick" class="place-name"></div><i data-bind="click: $root.placeClick" class="fa fa-star star-menu"></i>
+					<div data-bind="text: $data, click: $root.placeClick" class="place-name"></div><i data-bind="click: $root.favouriteClick, css: { 'star-yellow': $root.favourites().indexOf($data) >= 0 }" class="fa fa-star star-menu"></i>
 				</div>
 			</div>
 		</div>
@@ -36,10 +36,14 @@
 		<div class="search-container">
 		    <form data-bind="submit: searchBox" id="search-box">
 			    <input type="search" id="search" data-bind="value: searchQuery">
-			    <span data-bind="click: searchBox"class="icon"><i class="fa fa-search"></i></span>
+			    <span data-bind="click: searchBox" class="icon"><i class="fa fa-search"></i></span>
 				<submit>
 		    </form>
 		  </div>
+	</div>
+
+	<div class="favourites-temp" data-bind="foreach: favourites">
+			<p data-bind="text: $data">
 	</div>
 
 	<div id="map"></div> <!-- Main map holder -->
