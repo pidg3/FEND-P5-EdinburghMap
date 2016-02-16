@@ -171,15 +171,22 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	margin: 10px 0 10px 0;
 }
 
+.place-container > .fa-star:hover {
+	cursor: pointer;
+}
+
+.star-menu {
+	color: black;
+}
+.star-menu:hover {
+	color: #DADADA;
+}
+
 .star-yellow {
 	color: yellow;
 }
-
-
-
-.place-container > .fa-star:hover {
-	color: grey;
-	cursor: pointer;
+.star-yellow:hover {
+	color: #FFFF83;
 }
 
 /* For scrolling manu animations

@@ -55,12 +55,11 @@ function mapApp() {
 
 		// search entered: carries out search using Yelp API and returns results in menu list
 		self.mainSearch = function(type) {
-			yelpView.searchType(type, function(result) { // callback function - executes when Yelp datar returned
+			yelpView.searchType(type, function(result) { // callback function - executes when Yelp data returned
 				self.displayList([]); // reset list before re-populate
 				for (var i = 0; i < result.businesses.length; i++) { // iterate through list and populate displayList()
 					self.displayList.push(result.businesses[i].name);
 				}
-
 			});
 		};
 
@@ -74,7 +73,7 @@ function mapApp() {
 		self.searchBox = function() {
 			self.currentSearch(self.searchQuery()); // sets currentSearch to whatever is entered - used to display name of search
 			self.searchQuery(''); // resets text to blank
-			self.mainSearch(self.currentSearch()); // carried out actual search
+			self.mainSearch(self.currentSearch()); // carries out actual search
 		};
 
 		// displays marker for specific business when name clicked
@@ -84,27 +83,23 @@ function mapApp() {
 			});
 		};
 
-		// favourite places implementation
+		// favourite places implementation TODO - figure out how this works...
+		self.favourites = ko.observableArray(model.favouriteList); // set observable to point to model data
 
-		self.favourites = ko.observableArray();
-
-		self.favouriteClick = function(name) {
-			var removeIndex = self.favourites().indexOf(name);
+		self.favouriteClick = function(name) { // star icon clicked
+			var removeIndex = self.favourites().indexOf(name); // set value to index of matched name, or -1 if no match
 
 			if (removeIndex === -1) {
-				self.favourites().push(name);
+				self.favourites().push(name); // add to array
 			}
 			else if (removeIndex >= 0) {
-				self.favourites().splice(removeIndex, 1);
+				self.favourites().splice(removeIndex, 1); // remove from array
 			}
 			else {
-				alert('Issue with favourites functionality');
+				alert('Issue with favourites functionality'); // TODO - improve error handling
 			}
 
-			self.favourites(model.favouriteList);
-
-			console.log(self.favourites());
-
+			self.favourites(model.favouriteList); // update update model data
 		};
 
 	}
@@ -114,7 +109,7 @@ function mapApp() {
 	// for all Google Maps API functionality
 	var mapView = {
 
-		edinburgh: new google.maps.LatLng(55.944201, -3.197536), // hard Coded to Edinburgh
+		edinburgh: new google.maps.LatLng(55.944201, -3.197536), // hard-coded to Edinburgh
 
 
 		// having single infoWindow variable only allows one infoWindow at a time
@@ -353,11 +348,13 @@ function mapApp() {
 		}
 	};
 
+
 	// hold map closure - allows map to be accessed by other functions
 	var mapClosure = mapView.initMap();
 
 	// add menu/search listeners
 	interfaceView.menuListener(); 
 	interfaceView.searchListener();
+
 
 }
