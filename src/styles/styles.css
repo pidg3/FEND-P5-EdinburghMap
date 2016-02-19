@@ -113,14 +113,14 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	height: 28px;
 }
 
-.info-content .info-address a {
+.info-content a {
 	font-size: 11px;
 	color: #252525;
 	text-decoration: none;
 	padding: 0 0 0 10px;
 }
 
-.info-content .info-address a:hover {
+.info-content a:hover {
 	color: #252525;
 	text-decoration: underline;
 }
@@ -165,6 +165,8 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	cursor: pointer;
 }
 
+/* Stars - menu */
+
 .place-container > .fa-star {
 	font-size: 19px;
 	float: right;
@@ -175,10 +177,10 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	cursor: pointer;
 }
 
-.star-menu {
+.info-star {
 	color: black;
 }
-.star-menu:hover {
+.info-star:hover {
 	color: #DADADA;
 }
 
@@ -188,6 +190,42 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .star-yellow:hover {
 	color: #FFFF83;
 }
+
+/* Stars - infoWindow */
+
+.info-content > h4 {
+	float: left;
+	max-width: 75%;
+}
+
+.info-content > .info-copy {
+	clear: both;
+}
+
+.info-content > .fa-star {
+	font-size: 28px;
+	float: right;
+	margin: 8px 0 4px 0;
+}
+
+.info-content > .fa-star:hover {
+	cursor: pointer;
+}
+
+.info-star {
+	color: black;
+}
+.info-star:hover {
+	color: #DADADA;
+}
+
+.star-yellow {
+	color: yellow;
+}
+.star-yellow:hover {
+	color: #FFFF83;
+}
+
 
 /* For scrolling manu animations
 Mechanics in main.js 

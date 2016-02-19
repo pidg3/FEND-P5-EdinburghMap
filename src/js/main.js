@@ -84,27 +84,41 @@ function mapApp() {
 		};
 
 		// favourite places implementation TODO - figure out how this works...
-		self.favourites = ko.observableArray(model.favouriteList); // set observable to point to model data
+		self.favourites = ko.observableArray(); // set observable to point to model data+
 
-		self.favouriteClick = function(name) { // star icon clicked
-			var removeIndex = self.favourites().indexOf(name); // set value to index of matched name, or -1 if no match
+		// infoWindow data for bindings
+		self.infoWindowContent = {
+			name: '',
+			copy: '',
+			url: '',
+			rating: '',
+			photo: '',
+			mapLink: '',
+			address: ''
+		};
 
-			if (removeIndex === -1) {
-				self.favourites().push(name); // add to array
+		// toggles whether a place is included in model.favouriteList
+		self.toggleFavourite = function(name) { // generic function to toggle whether a place name is included in favourites
+			var favouriteIndex = model.favouriteList.indexOf(name); // set value to index of matched name, or -1 if no match
+
+			if (favouriteIndex === -1) {
+				model.favouriteList.push(name); // add to array
 			}
-			else if (removeIndex >= 0) {
-				self.favourites().splice(removeIndex, 1); // remove from array
+			else if (favouriteIndex >= 0) {
+				model.favouriteList.splice(favouriteIndex, 1); // remove from array
 			}
 			else {
 				alert('Issue with favourites functionality'); // TODO - improve error handling
 			}
 
-			self.favourites(model.favouriteList); // update update model data
+			self.favourites(model.favouriteList.slice()); // update observable with model data
 		};
 
 	}
 
-	ko.applyBindings(new appViewModel()); // triggers KO bindings
+	// applies bindings to a variable so functions can be referenced by other parts of app i.e. not just DOM bindings
+	var appViewModelContainer = new appViewModel();
+	ko.applyBindings(appViewModelContainer);
 
 	// for all Google Maps API functionality
 	var mapView = {
@@ -135,10 +149,12 @@ function mapApp() {
 		// determine which icon to use based on data in model
 		// have to pass in single Yelp place object
 		createMarker: function(place) {
+			
+			var self = this;
 
 			console.log(place);
 
-			var currentIcon = '';
+			self.currentIcon = '';
 
 			// loop through Yelp object categories and match to matrix of images in model
 			// two loops required due to JSON structure
@@ -146,48 +162,63 @@ function mapApp() {
 			for (var i = 0; i < place.categories.length; i++) { 
 				for (var ref in model.iconLibrary) {
 					if (place.categories[i][1] === ref) {
-						currentIcon = model.iconLibrary[ref];
+						self.currentIcon = model.iconLibrary[ref];
 						break;
 					}
 				}
-				if (currentIcon !== '') {
+				if (self.currentIcon !== '') {
 					break;
 				}
 
 			}
 
 			// if match not found, set to default symbol
-			if (currentIcon === '') { 
-				currentIcon = model.defaultIcon;
+			if (self.currentIcon === '') { 
+				self.currentIcon = model.defaultIcon;
 			}
 
 			// get location from Yelp object
-			var placeLoc = new google.maps.LatLng(place.location.coordinate.latitude, place.location.coordinate.longitude); 
+			self.placeLoc = new google.maps.LatLng(place.location.coordinate.latitude, place.location.coordinate.longitude); 
 
 			// create actual marker
-			var marker = new google.maps.Marker({
+			self.marker = new google.maps.Marker({
 				map: mapClosure, 
-				position: placeLoc,
+				position: self.placeLoc,
 				animation: google.maps.Animation.DROP, // TODO - replace with BOUNCE with timeout due to issues with animation
-				icon: currentIcon // custom variable marker as defined above
+				icon: self.currentIcon // custom variable marker as defined above
 			});
 
 			// pre-set content of infoWindow
-			var infoWindowContent = 
-			'<div class="info-content"><h4>' + place.name + '</h4><br>' +
-			'<p>' + place.snippet_text + '...<a href="' + place.url + '" target="_blank">Read more</a></p>' +
-			'<img class="info-photo" src="' + place.image_url + '" alt="Place Image"></img>' +
-			'<img class="info-rating" src="' + place.rating_img_url_large + '"></img>' +
-			'<p class="info-address"><a href="http://maps.google.com/?q=' + place.name + ',Edinburgh' + '" target="_blank">' + place.location.address + '</a></p>' +
-			'<img class="info-yelp" src="../images/yelp_powered_btn_dark.png" ></img>' +
-			'</div>';
+			self.infoWindowTemplate = '<div class="info-content info-hidden" id="info-window" data-bind="template: { name: \'infoWindow-template\', data: infoWindowContent }"></div>';
 
 			// listen for clicks: bring content as Google Maps infoWindow
-			google.maps.event.addListener(marker, 'click', function() { 
-				mapView.infoWindow.setContent(infoWindowContent);
-				mapView.infoWindow.open(mapClosure, this); // show actual infoWindow
+			google.maps.event.addListener(self.marker, 'click', function() { 
+				self.setContent(self.infoWindowTemplate, place, this);
 			});
+
+			self.setContent = function(content, place, context) {
+
+				// set infoWindow content in viewModel bindings
+				appViewModelContainer.infoWindowContent.name = place.name;
+				appViewModelContainer.infoWindowContent.copy = place.snippet_text;
+				appViewModelContainer.infoWindowContent.url = place.url;
+				appViewModelContainer.infoWindowContent.photo = place.image_url;
+				appViewModelContainer.infoWindowContent.rating = place.rating_img_url_large;
+				appViewModelContainer.infoWindowContent.url = 'http://maps.google.com/?q=' + place.name + ',Edinburgh';
+				appViewModelContainer.infoWindowContent.address = place.location.address;
+
+				// set infoWindow content - includes binding to trigger template
+				mapView.infoWindow.setContent(content);
+
+				// show actual infoWindow
+				mapView.infoWindow.open(mapClosure, context); // TODO - better loading animation, take out flickers
+
+				// apply bindings
+				ko.applyBindings(appViewModelContainer, document.getElementById('info-window'));
+
+			};
 		}
+
 	};
 
 	// all Yelp API calls

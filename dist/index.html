@@ -25,7 +25,7 @@
 			<hr>
 			<div data-bind="foreach: displayList">
 				<div class="place-container">
-					<div data-bind="text: $data, click: $root.placeClick" class="place-name"></div><i data-bind="click: $root.favouriteClick, css: { 'star-yellow': $root.favourites().indexOf($data) >= 0 }" class="fa fa-star star-menu"></i>
+					<div data-bind="text: $data, click: $root.placeClick" class="place-name"></div><i data-bind="click: $root.toggleFavourite, css: { 'star-yellow': $root.favourites().indexOf($data) >= 0 }" class="fa fa-star star-menu"></i>
 				</div>
 			</div>
 		</div>
@@ -46,7 +46,20 @@
 			<p data-bind="text: $data">
 	</div>
 
-	<div id="map"></div> <!-- Main map holder -->
+	<!-- Main map container -->
+	<div id="map"></div>
+
+	<!-- Map infoWindow template -->
+	<script type="text/html" id="infoWindow-template">
+		<h4 data-bind="text: name"></h4> 
+		<i class="fa fa-star info-star" data-bind="css: { 'star-yellow': $parent.favourites().indexOf(name) >= 0 }, click: $root.toggleFavourite.bind(this, name)"></i><br> <!-- bind needed to prevent calling click function on load -->
+		<p class="info-copy" data-bind="text: copy"></p> 
+		<a data-bind="attr: { href: url }" target="_blank">Full review</a> 
+		<img class="info-photo" data-bind="attr: { src: photo }" alt="Place Image"></img> 
+		<img class="info-rating" data-bind="attr: { src: rating }"></img> 
+		<a data-bind="attr: { href: mapLink }, text: address" target="_blank"></a> 
+		<img class="info-yelp" src="../images/yelp_powered_btn_dark.png" ></img> 
+	</script>
 
 	<script src="js/all-js.min.js"></script>
 
