@@ -246,7 +246,6 @@ function mapApp() {
 		commonParameters: {
 			oauth_consumer_key: 'VysIcTbiC1NAl7xLTDqCrA',
 			oauth_token: 'pEE9CKVmrKhZr6yVigDUMej-pEu526M_',
-			oauth_timestamp: Math.floor(Date.now()/1000),
 			oauth_signature_method: 'HMAC-SHA1',
 			oauth_version : '1.0',
 			callback: 'cb',
@@ -259,7 +258,8 @@ function mapApp() {
 
 			var nameParameters = {
 				term : name, // search for name passed to searchName
-				limit: 1
+				limit: 1,
+				oauth_timestamp: Math.floor(Date.now()/1000) // generated with each request to avoid timeout issues (300 second limit)
 			};
 
 			$.extend(nameParameters, this.commonParameters);
@@ -290,7 +290,8 @@ function mapApp() {
 
 			var typeParameters = {
 				term : type, // search for type passed to searchType
-				limit: 10
+				limit: 10,
+				oauth_timestamp: Math.floor(Date.now()/1000) // generated with each request to avoid timeout issues (300 second limit)
 			};
 
 			$.extend(typeParameters, this.commonParameters);
