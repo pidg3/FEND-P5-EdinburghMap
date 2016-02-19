@@ -17,7 +17,9 @@ KnockoutJS used as framework as per Udacity project rubric. JS currently divided
 
 * Not all restaurants show as icon as Yelp API does not provide an overall category, only sub-category e.g. Indian, French.
 * Chain stores are not well handled e.g. search for Starbucks
-* All sorts of stuff returned in search - add filter for zero reviews? 
+* All sorts of stuff returned in search - add filter for zero reviews?
+* Links in infoWindows need fixing
+* Formatting in main list not watertight - e.g. venues
 
 ## Notes
 

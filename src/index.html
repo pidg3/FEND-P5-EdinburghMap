@@ -30,7 +30,10 @@
 </head>
 
 <body>
-	<div class="menu-container"> <!-- Main menu. Shown off-screen initially -->
+
+	<!-- ======== Interface drop-downs: initially hidden ======== -->
+
+	<div class="interface-container"> <!-- Main menu -->
 		<div id="menu">
 			<p data-bind="text: currentSearch" class="menu-heading"></p>
 			<hr>
@@ -41,23 +44,24 @@
 			</div>
 		</div>
 	</div>
-	<div class="menu-container"> <!-- favourites list. Shown off-screen initially -->
+	<div class="interface-container"> <!-- Favourites list -->
 		<div id="favourites">
 			<p class="menu-heading">Favourite Places</p>
 			<hr>
 			<div data-bind="foreach: favourites">
 				<div class="place-container">
-					<div data-bind="text: $data, click: $root.placeClick" class="place-name"></div><i data-bind="click: $root.toggleFavourite, css: { 'star-yellow': $root.favourites().indexOf($data) >= 0 }" class="fa fa-star star-menu"></i>
+					<div data-bind="text: $data, click: $root.placeClick" class="place-name"></div><i data-bind="click: $root.toggleFavourite" class="fa fa-times"></i>
 				</div>
 			</div>
 
 		</div>
 	</div>
 
+	<!-- ======== Top bar, containing interface icons and search box ======== -->
+
 	<div class="top-bar">
 		<i id="toggle-menu" class="fa fa-bars fa-3x"></i>
 		<i id="toggle-favourites" class="fa fa-star fa-3x"></i>
-
 
 		<div class="search-container">
 		    <form data-bind="submit: searchBox" id="search-box">
@@ -66,16 +70,15 @@
 				<submit>
 		    </form>
 		  </div>
+
 	</div>
 
-	<div class="favourites-temp" data-bind="foreach: favourites">
-			<p data-bind="text: $data">
-	</div>
+	<!-- ======== Main map container ======== -->
 
-	<!-- Main map container -->
-	<div id="map"></div>
+	<div id="map" class="map"></div>
 
-	<!-- Map infoWindow template -->
+	<!-- ======== Map InfoWindow template ======== -->
+
 	<script type="text/html" id="infoWindow-template">
 		<h4 data-bind="text: name"></h4> 
 		<i class="fa fa-star star-black" data-bind="css: { 'star-yellow': $parent.favourites().indexOf(name) >= 0 }, click: $root.toggleFavourite.bind(this, name)"></i><br> <!-- bind needed to prevent calling click function on load -->

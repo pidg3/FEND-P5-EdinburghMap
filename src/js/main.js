@@ -1,6 +1,8 @@
 // Maps API key: AIzaSyCKaSn7cGU9ER9KVO63fCTQFOPUnOg1q9U
 
-/*eslint-disable no-console */ // TODO - remove for Prod
+// TODO - resolve bug with infoWindow links
+
+/*eslint-disable no-console */
 /* exported mapApp */ // called by maps API callback in index.html
 
 // container for whole app - single global variable
@@ -67,7 +69,7 @@ function mapApp() {
 		self.searchQuery = ko.observable(); 
 
 		// set by search query, only used for display via binding, allows reset of search box text between queries
-		self.currentSearch = ko.observable(); 
+		self.currentSearch = ko.observable('Search for something to get started...'); 
 
 		// triggered by search bar entry
 		self.searchBox = function() {
