@@ -30,9 +30,9 @@
 </head>
 
 <body>
-	<div class="menu-container"> <!-- Shown off-screen initially -->
+	<div class="menu-container"> <!-- Main menu. Shown off-screen initially -->
 		<div id="menu">
-			<p data-bind="text: currentSearch" class="place-type"></p>
+			<p data-bind="text: currentSearch" class="menu-heading"></p>
 			<hr>
 			<div data-bind="foreach: displayList">
 				<div class="place-container">
@@ -41,8 +41,23 @@
 			</div>
 		</div>
 	</div>
+	<div class="menu-container"> <!-- favourites list. Shown off-screen initially -->
+		<div id="favourites">
+			<p class="menu-heading">Favourite Places</p>
+			<hr>
+			<div data-bind="foreach: favourites">
+				<div class="place-container">
+					<div data-bind="text: $data, click: $root.placeClick" class="place-name"></div><i data-bind="click: $root.toggleFavourite, css: { 'star-yellow': $root.favourites().indexOf($data) >= 0 }" class="fa fa-star star-menu"></i>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
 	<div class="top-bar">
 		<i id="toggle-menu" class="fa fa-bars fa-3x"></i>
+		<i id="toggle-favourites" class="fa fa-star fa-3x"></i>
+
 
 		<div class="search-container">
 		    <form data-bind="submit: searchBox" id="search-box">
@@ -63,7 +78,7 @@
 	<!-- Map infoWindow template -->
 	<script type="text/html" id="infoWindow-template">
 		<h4 data-bind="text: name"></h4> 
-		<i class="fa fa-star info-star" data-bind="css: { 'star-yellow': $parent.favourites().indexOf(name) >= 0 }, click: $root.toggleFavourite.bind(this, name)"></i><br> <!-- bind needed to prevent calling click function on load -->
+		<i class="fa fa-star star-black" data-bind="css: { 'star-yellow': $parent.favourites().indexOf(name) >= 0 }, click: $root.toggleFavourite.bind(this, name)"></i><br> <!-- bind needed to prevent calling click function on load -->
 		<p class="info-copy" data-bind="text: copy"></p> 
 		<a data-bind="attr: { href: url }" target="_blank">Full review</a> 
 		<img class="info-photo" data-bind="attr: { src: photo }" alt="Place Image"></img> 

@@ -348,6 +348,31 @@ function mapApp() {
 			});
 		},
 
+		favouritesListener: function() {
+			$('#toggle-favourites').on('click', function() {
+
+				console.log('Favourites clicked');
+
+				var favourites = $('#favourites');
+
+				favourites.addClass('animating');
+				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
+					favourites.addClass('bottom');
+				} 
+				else {
+					favourites.addClass('top');
+				}
+
+				// callback when transition ends
+				favourites.on(interfaceView.transitionEnd, function() {
+					favourites
+					.removeClass('animating top bottom')
+					.toggleClass('menu-visible');
+					favourites.off(interfaceView.transitionEnd); // removes event handler
+				});
+			});
+		},
+
 		// listens for searches
 		// if menu not open - open it
 		// if menu open - pulse animation
@@ -385,7 +410,9 @@ function mapApp() {
 
 	// add menu/search listeners
 	interfaceView.menuListener(); 
+	interfaceView.favouritesListener();
 	interfaceView.searchListener();
+
 
 
 }

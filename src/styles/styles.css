@@ -5,8 +5,10 @@
 
 /* Z-index tracker:
 
-Top bar: 2
+Top bar: 3
 Menu box: 1
+Favourites box: 1
+
 
 */
 
@@ -26,7 +28,7 @@ html, body, input {
 	width: auto;
 	background-color: white;
 	box-shadow: 0 5px 5px #888888;
-	z-index: 2;
+	z-index: 3;
 	position: relative;
 }
 
@@ -36,7 +38,19 @@ html, body, input {
 }
 
 .top-bar > .fa-bars:hover {
+	cursor: pointer;
+	color: #686868;
+}
+
+.top-bar > .fa-star { /* Hamburger icon */
+	font-size: 36px;
+	margin: 4px 4px 4px 10px;
+}
+
+.top-bar > .fa-star:hover {
 	cursor: pointer;	
+	color: #686868;
+
 }
 
 #map {
@@ -138,13 +152,28 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	background-color: white;
 	margin: 0;
 	width: 200px;
-	max-height: 480px;
+	height: 480px;
 	overflow: hidden;
 	box-shadow: 0 5px 5px #888888;
 	padding: 10px 25px;
 }
 
-.place-type {
+#favourites {
+	z-index: 2;
+	position: relative;
+	background-color: white;
+	margin: 0;
+	width: 200px;
+	height: 480px;
+	max-height: 480px;
+	overflow: hidden;
+	box-shadow: 0 5px 5px #888888;
+	padding: 10px 25px;
+	left: 60px;
+}	
+
+
+.menu-heading {
 	font-weight: 700;
 }
 
@@ -177,10 +206,10 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	cursor: pointer;
 }
 
-.info-star {
+.star-black {
 	color: black;
 }
-.info-star:hover {
+.star-black:hover {
 	color: #DADADA;
 }
 
@@ -216,14 +245,14 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	color: black;
 }
 .info-star:hover {
-	color: #DADADA;
+	color: #686868;
 }
 
 .star-yellow {
 	color: yellow;
 }
 .star-yellow:hover {
-	color: #FFFF83;
+	color: #686868;
 }
 
 
