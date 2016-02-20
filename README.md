@@ -19,7 +19,6 @@ KnockoutJS used as framework as per Udacity project rubric. JS currently divided
 * Chain stores are not well handled e.g. search for Starbucks
 * All sorts of stuff returned in search - add filter for zero reviews?
 * Links in infoWindows need fixing
-* Formatting in main list not watertight - e.g. venues
 
 ## Notes
 

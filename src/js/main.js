@@ -57,15 +57,15 @@ function mapApp() {
 
 		// search entered: carries out search using Yelp API and returns results in menu list
 		self.mainSearch = function(type) {+
-			$('#search-display').addClass('menu-hidden'); // shows loading spinner and hides search results
-			$('#search-loading').removeClass('menu-hidden');
+			$('#search-display').addClass('hidden'); // shows loading spinner and hides search results
+			$('#search-loading').removeClass('hidden');
 			yelpView.searchType(type, function(result) { // callback function - executes when Yelp data returned
 				self.displayList([]); // reset list before re-populate
 				for (var i = 0; i < result.businesses.length; i++) { // iterate through list and populate displayList()
 					self.displayList.push(result.businesses[i].name);
 				}
-				$('#search-display').removeClass('menu-hidden'); // hides loading spinner and shows search results
-				$('#search-loading').addClass('menu-hidden');
+				$('#search-display').removeClass('hidden'); // hides loading spinner and shows search results
+				$('#search-loading').addClass('hidden');
 
 			});
 		};
@@ -196,10 +196,10 @@ function mapApp() {
 			});
 
 			// pre-set content of infoWindow
-			self.infoWindowTemplate = '<div class="info-content info-hidden" id="info-window" data-bind="template: { name: \'infoWindow-template\', data: infoWindowContent }"></div>';
+			self.infoWindowTemplate = '<div class="info-content" id="info-window" data-bind="template: { name: \'infoWindow-template\', data: infoWindowContent }"></div>';
 
 			// listen for clicks: bring content as Google Maps infoWindow
-			google.maps.event.addListener(self.marker, 'click', function() { 
+			google.maps.event.addListener(self.marker, 'click', function() {
 				self.setContent(self.infoWindowTemplate, place, this);
 			});
 
@@ -213,7 +213,7 @@ function mapApp() {
 				appViewModelContainer.infoWindowContent.rating = place.rating_img_url_large;
 				appViewModelContainer.infoWindowContent.url = 'http://maps.google.com/?q=' + place.name + ',Edinburgh';
 				appViewModelContainer.infoWindowContent.address = place.location.address;
-
+				
 				// set infoWindow content - includes binding to trigger template
 				mapView.infoWindow.setContent(content);
 
@@ -222,7 +222,6 @@ function mapApp() {
 
 				// apply bindings
 				ko.applyBindings(appViewModelContainer, document.getElementById('info-window'));
-
 			};
 		}
 
@@ -281,7 +280,7 @@ function mapApp() {
 				cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
 				dataType: 'jsonp',
 				success: callback,				
-				fail: function() {
+				error: function() {
 					alert('AJAX request failed.'); // TODO better error handling
 				}
 			};
@@ -312,7 +311,7 @@ function mapApp() {
 				cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
 				dataType: 'jsonp',
 				success: callback,				
-				fail: function() {
+				error: function() {
 					alert('AJAX request failed.'); // TODO better error handling
 				}
 			};

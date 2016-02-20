@@ -62,7 +62,11 @@ html, body, input {
 	height: 100%;
 	font-family: 'Raleway', sans-serif;
 	color: #252525;
-	}
+}
+
+.hidden { /* for hiding divs, loading time etc */
+	display: none;
+}
 
 /* ======== Top bar ======== */
 
@@ -218,17 +222,14 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	padding: 100px 0;
 }
 
-.menu-hidden {
-	display: none;
-}
-
 #menu { /* deliberately delcared as ID a) for jQuery selectors b) to override other classes */
 	z-index: 1;
 	position: relative;
 	background-color: white;
 	margin: 0;
 	width: 200px;
-	height: 480px;
+	min-height: 400px;
+	max-height: 500px;
 	overflow: auto;
 	box-shadow: 0 5px 5px #888888;
 	padding: 10px 25px;
@@ -240,7 +241,8 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	background-color: white;
 	margin: 0;
 	width: 200px;
-	height: 480px;
+	min-height: 400px;
+	max-height: 500px;
 	overflow: auto;
 	box-shadow: 0 5px 5px #888888;
 	padding: 10px 25px;
@@ -255,7 +257,7 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .place-container > .place-name {
 	float: left;
 	clear: left; /* Stops multuiple entries on same line */
-	max-width: 170px;
+	max-width: 160px;
 	font-size: 16px;
 	margin: 10px 0 10px 0;
 }
