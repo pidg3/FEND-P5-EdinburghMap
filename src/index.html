@@ -37,11 +37,15 @@
 		<div id="menu">
 			<p data-bind="text: currentSearch" class="menu-heading"></p>
 			<hr>
-			<div data-bind="foreach: displayList">
+			<div data-bind="foreach: displayList" id="search-display">
 				<div class="place-container">
 					<div data-bind="text: $data, click: $root.placeClick" class="place-name"></div><i data-bind="click: $root.toggleFavourite, css: { 'star-yellow': $root.favourites().indexOf($data) >= 0 }" class="fa fa-star star-menu"></i>
 				</div>
 			</div>
+			<div id="search-loading" class="menu-hidden">
+				<i class="fa fa-refresh fa-spin"></i>
+			</div>
+
 		</div>
 	</div>
 	<div class="interface-container"> <!-- Favourites list -->

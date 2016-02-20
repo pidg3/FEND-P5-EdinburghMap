@@ -56,12 +56,17 @@ function mapApp() {
 		self.displayList = ko.observableArray(); // results shown in menu
 
 		// search entered: carries out search using Yelp API and returns results in menu list
-		self.mainSearch = function(type) {
+		self.mainSearch = function(type) {+
+			$('#search-display').addClass('menu-hidden'); // shows loading spinner and hides search results
+			$('#search-loading').removeClass('menu-hidden');
 			yelpView.searchType(type, function(result) { // callback function - executes when Yelp data returned
 				self.displayList([]); // reset list before re-populate
 				for (var i = 0; i < result.businesses.length; i++) { // iterate through list and populate displayList()
 					self.displayList.push(result.businesses[i].name);
 				}
+				$('#search-display').removeClass('menu-hidden'); // hides loading spinner and shows search results
+				$('#search-loading').addClass('menu-hidden');
+
 			});
 		};
 

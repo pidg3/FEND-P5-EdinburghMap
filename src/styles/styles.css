@@ -211,6 +211,17 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	top: -480px; /* Hide off-screen initially */
 }
 
+#search-loading {
+	text-align: center;
+	font-size: 84px;
+	width: 100%;
+	padding: 100px 0;
+}
+
+.menu-hidden {
+	display: none;
+}
+
 #menu { /* deliberately delcared as ID a) for jQuery selectors b) to override other classes */
 	z-index: 1;
 	position: relative;
