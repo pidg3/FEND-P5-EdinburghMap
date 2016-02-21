@@ -71,20 +71,20 @@ function mapApp() {
 		var self = this; 
 
 		self.displayList = ko.observableArray(); // results shown in menu
-		self.uniqueIdList = ko.observableArray(); // for unique IDs - not shown in menu but used for other function calls
+		self.uniqueIDList = ko.observableArray(); // for unique IDs - not shown in menu but used for other function calls
 
 		// search entered: carries out search using Yelp API and returns results in menu list
-		self.mainSearch = function(type) {
+		self.mainSearch = function(query) {
 			$('#search-display').addClass('hidden'); // shows loading spinner and hides search results
 			$('#search-loading').removeClass('hidden');
 
-			yelpView.searchType(type, function(result) { // callback function - executes when Yelp data returned
+			yelpView.searchAll(query, function(result) { // callback function - executes when Yelp data returned
 				self.displayList([]); // reset lists before re-populate
-				self.uniqueIdList([]); 
+				self.uniqueIDList([]); 
 
 				for (var i = 0; i < result.businesses.length; i++) { // iterate through list and populate displayList() / uniqueIdList()
 					self.displayList.push(result.businesses[i].name);
-					self.uniqueIdList.push(result.businesses[i].id);
+					self.uniqueIDList.push(result.businesses[i].id);
 				}
 
 				$('#search-display').removeClass('hidden'); // hides loading spinner and shows search results
@@ -108,11 +108,12 @@ function mapApp() {
 
 		// displays marker for specific business when name clicked
 		self.placeClick = function(name, index) {
-			console.log(name);
-			console.log(self.uniqueIdList()[index]);
 
-			yelpView.searchName(name, function(result) {
-				mapView.createMarker(result.businesses[0]);
+			var ID = self.uniqueIDList()[index];
+
+			yelpView.searchID(ID, function(result) {
+				console.log(result);
+				mapView.createMarker(result);
 			});
 		};
 
@@ -309,7 +310,6 @@ function mapApp() {
 		// TODO - hide using server side code
 
 		yelpAPI: {
-			yelp_url: 'http://api.yelp.com/v2/search',
 			YELP_KEY_SECRET: 'sWaoF5jHGhP3lrRobEOhgBpYq80',	
 			YELP_TOKEN_SECRET: '54_OmI6aX963nRd9JJBb1PTLy5A'
 		},
@@ -327,27 +327,28 @@ function mapApp() {
 			location : 'Edinburgh'
 		},
 
-		// function needs to be called using callback to 'do something' with the result
+		// functions need to be called using callback to 'do something' with the result
 		// this avoids issues due to async AJAX request
-		searchName: function(name, callback) {
 
-			var nameParameters = {
-				term : name, // search for name passed to searchName
-				limit: 1,
+		searchID: function(ID, callback) { // search by specific ID - must match exactly
+
+			var IDParameters = {
 				oauth_timestamp: Math.floor(Date.now()/1000) // generated with each request to avoid timeout issues (300 second limit)
 			};
 
-			$.extend(nameParameters, this.commonParameters);
+			var IDUrl = 'https://api.yelp.com/v2/business/' + ID;
+
+			$.extend(IDParameters, this.commonParameters);
 
 
-			nameParameters.oauth_nonce = this.nonce_generate(); // must be before signature generated otherwise will return 400 error
+			IDParameters.oauth_nonce = this.nonce_generate(); // must be before signature generated otherwise will return 400 error
 
-			var encodedSignature = oauthSignature.generate('GET', this.yelpAPI.yelp_url, nameParameters, this.yelpAPI.YELP_KEY_SECRET, this.yelpAPI.YELP_TOKEN_SECRET);
-			nameParameters.oauth_signature = encodedSignature;
+			var encodedSignature = oauthSignature.generate('GET', IDUrl, IDParameters, this.yelpAPI.YELP_KEY_SECRET, this.yelpAPI.YELP_TOKEN_SECRET);
+			IDParameters.oauth_signature = encodedSignature;
 
 			var ajaxParameters = {
-				url: yelpView.yelpAPI.yelp_url,
-				data: nameParameters,
+				url: IDUrl,
+				data: IDParameters,
 				cache: true,                // crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
 				dataType: 'jsonp',
 				success: callback			
@@ -360,10 +361,11 @@ function mapApp() {
 			});
 		},
 
-		searchType: function(type, callback) {
+
+		searchAll: function(query, callback) { // search for 'anything' - place name, type etc
 
 			var typeParameters = {
-				term : type, // search for type passed to searchType
+				term : query, // search for query passed to searchAll
 				limit: 10,
 				oauth_timestamp: Math.floor(Date.now()/1000) // generated with each request to avoid timeout issues (300 second limit)
 			};
@@ -372,11 +374,11 @@ function mapApp() {
 
 			typeParameters.oauth_nonce = this.nonce_generate(); // must be before signature generated otherwise will return 400 error
 
-			var encodedSignature = oauthSignature.generate('GET', this.yelpAPI.yelp_url, typeParameters, this.yelpAPI.YELP_KEY_SECRET, this.yelpAPI.YELP_TOKEN_SECRET);
+			var encodedSignature = oauthSignature.generate('GET', 'https://api.yelp.com/v2/search', typeParameters, this.yelpAPI.YELP_KEY_SECRET, this.yelpAPI.YELP_TOKEN_SECRET);
 			typeParameters.oauth_signature = encodedSignature;
 
 			var ajaxParameters = {
-				url: yelpView.yelpAPI.yelp_url,
+				url: 'https://api.yelp.com/v2/search',
 				data: typeParameters,
 				cache: true,                // crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
 				dataType: 'jsonp',
