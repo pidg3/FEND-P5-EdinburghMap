@@ -3,10 +3,25 @@
 // TODO - resolve bug with infoWindow links
 
 /*eslint-disable no-console */
-/* exported mapApp */ // called by maps API callback in index.html
+/* exported mapApp mapError */ // called by maps API callback in index.html
 
 // container for whole app - single global variable
 // called by Google Maps script in index.html
+
+function mapInit() {
+	var url = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCKaSn7cGU9ER9KVO63fCTQFOPUnOg1q9U&callback=mapApp&libraries=places';
+	$.getScript(url)
+
+	// if getting the script fails
+	// error handling not done via knockout as avoids the need to artificially set bindings for all elements in DOM
+	.fail(function() {
+		$('#error-handler p:first-of-type').append('<p>Google Maps seems to have gone AWOL.</p>');
+		$('#error-handler').css('display', 'block');
+	});
+}
+
+mapInit();
+
 function mapApp() {
 	'use strict';
 	var model = {
@@ -50,7 +65,7 @@ function mapApp() {
 	};	
 
 	// delared as function as per KnockoutJS documentation
-	function appViewModel() { 
+	function appViewModel() {
 		var self = this; 
 
 		self.displayList = ko.observableArray(); // results shown in menu
@@ -115,15 +130,15 @@ function mapApp() {
 				model.favouriteList.splice(favouriteIndex, 1); // remove from array
 			}
 			else {
-				alert('Issue with favourites functionality'); // TODO - improve error handling
+				self.errorHandler('The favourites functionality seems to have suffered a meltdown.'); // error handling
 			}
 
 			self.favourites(model.favouriteList.slice()); // update observable with model data
 		};
 
+		// error handling
 		self.errorToggle = ko.observable(0); // 0 for no error; 1 for error state
 		self.errorMessage = ko.observable(); // used for specific part erroring to customise error message
-
 		self.errorHandler = function(component) {
 			if (typeof component === 'string') { // custom error message. typeof needed to filter out knockout objects that may find their way in
 				self.errorMessage(component);
@@ -133,15 +148,12 @@ function mapApp() {
 				self.errorMessage('One of the moving parts seems to have thrown a wobbly.');
 			}
 
-			self.errorToggle(1); // triggers changes in display
-
+			self.errorToggle(1); // triggers changes in display for both map and error-handler divs
 
 			$('#toggle-menu').off(); // remove event handlers
 			$('#toggle-favourites').off();
 			$('#search-box').off();
-
 		};
-
 	}
 
 	// applies bindings to a variable so functions can be referenced by other parts of app i.e. not just DOM bindings
@@ -298,16 +310,16 @@ function mapApp() {
 			var ajaxParameters = {
 				url: yelpView.yelpAPI.yelp_url,
 				data: nameParameters,
-				cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
+				cache: true,                // crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
 				dataType: 'jsonp',
-				success: callback,				
-				error: function() {
-					alert('AJAX request failed.'); // TODO better error handling
-				}
+				success: callback			
 			};
 
 			// Send AJAX query via jQuery library.
-			$.ajax(ajaxParameters); // return to be parsed by other function - API call only here
+			$.ajax(ajaxParameters) // return to be parsed by other function - API call only here
+			.error(function(){
+				appViewModelContainer.errorHandler('The Yelp API is misbehaving.'); // error handling
+			});
 
 		},
 
@@ -329,17 +341,16 @@ function mapApp() {
 			var ajaxParameters = {
 				url: yelpView.yelpAPI.yelp_url,
 				data: typeParameters,
-				cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
+				cache: true,                // crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
 				dataType: 'jsonp',
-				success: callback,				
-				error: function() {
-					alert('AJAX request failed.'); // TODO better error handling
-				}
+				success: callback				
 			};
 
 			// Send AJAX query via jQuery library.
-			$.ajax(ajaxParameters); // return to be parsed by other function - API call only here
-
+			$.ajax(ajaxParameters)
+			.error(function(){
+				appViewModelContainer.errorHandler('The Yelp API is misbehaving.'); // error handling
+			});
 		}
 	};
 
@@ -440,7 +451,5 @@ function mapApp() {
 	interfaceView.menuListener(); 
 	interfaceView.favouritesListener();
 	interfaceView.searchListener();
-
-
 
 }
