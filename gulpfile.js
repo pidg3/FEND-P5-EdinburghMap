@@ -7,6 +7,7 @@ var gulp = require('gulp'),
 	streamQueue = require('streamqueue'),
 	mainBowerFiles = require('main-bower-files'),
 	processHTML = require('gulp-processhtml'),
+	stripDebug = require('gulp-strip-debug'),
 	rm = require('gulp-rimraf'),
 	gulpsync = require('gulp-sync')(gulp);
 
@@ -57,6 +58,7 @@ gulp.task('js', function() {
 		gulp.src('src/js/*.js')
 		)
 		.pipe(concat('all-js.min.js'))
+		.pipe(stripDebug())
 		.pipe(uglify())
 		.pipe(gulp.dest('dist/js/'));
 });

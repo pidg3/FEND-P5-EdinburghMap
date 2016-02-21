@@ -26,6 +26,8 @@ function mapApp() {
 	'use strict';
 	var model = {
 
+
+
 		// there isn't a high-level category in the yelp API e.g. restaurants
 		// this is annoying and has resulted in the hacky-feeling list below
 		// TODO: find better way of managing this
@@ -58,9 +60,11 @@ function mapApp() {
 			'stadiumsarenas': '../images/sports.png'
 		},
 
-		defaultIcon: '../images/other.png',
+		defaultIcon: '../images/other.png', // used if cannot find a match with other icons
 
-		favouriteList: []
+		favouriteList: [],
+
+		markers: [] // holds current markers
 
 	};	
 
@@ -154,6 +158,12 @@ function mapApp() {
 			$('#toggle-favourites').off();
 			$('#search-box').off();
 		};
+
+		// TEST - TODO remove
+
+		self.clearMarkers = function() {
+			mapView.clearMarkers();
+		};
 	}
 
 	// applies bindings to a variable so functions can be referenced by other parts of app i.e. not just DOM bindings
@@ -236,6 +246,13 @@ function mapApp() {
 				self.setContent(self.infoWindowTemplate, place, this);
 			});
 
+			// populate array of current markers
+			self.forModel = {};
+			self.forModel[place.name] = self.marker; 
+			model.markers.push(self.forModel);
+			console.log(model.markers); // TODO - remove
+
+
 			self.setContent = function(content, place, context) {
 
 				// set infoWindow content in viewModel bindings
@@ -256,6 +273,18 @@ function mapApp() {
 				// apply bindings
 				ko.applyBindings(appViewModelContainer, document.getElementById('info-window'));
 			};
+		},
+
+
+		// clear all markers TODO - build in functionality to leave favourites alone (differnt colour?)
+		clearMarkers: function() {
+			for (var i = 0; i < model.markers.length; i++) { // loop through markers in model data
+				console.log(model.markers[i]);
+				var currentMarker = model.markers[i][Object.keys(model.markers[i])[0]];
+				currentMarker.setMap(null); // set so do not display on map
+			}
+
+			model.markers = [];
 		}
 
 	};
@@ -320,7 +349,6 @@ function mapApp() {
 			.error(function(){
 				appViewModelContainer.errorHandler('The Yelp API is misbehaving.'); // error handling
 			});
-
 		},
 
 		searchType: function(type, callback) {
