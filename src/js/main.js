@@ -26,8 +26,6 @@ function mapApp() {
 	'use strict';
 	var model = {
 
-
-
 		// there isn't a high-level category in the yelp API e.g. restaurants
 		// this is annoying and has resulted in the hacky-feeling list below
 		// TODO: find better way of managing this
@@ -73,16 +71,22 @@ function mapApp() {
 		var self = this; 
 
 		self.displayList = ko.observableArray(); // results shown in menu
+		self.uniqueIdList = ko.observableArray(); // for unique IDs - not shown in menu but used for other function calls
 
 		// search entered: carries out search using Yelp API and returns results in menu list
-		self.mainSearch = function(type) {+
+		self.mainSearch = function(type) {
 			$('#search-display').addClass('hidden'); // shows loading spinner and hides search results
 			$('#search-loading').removeClass('hidden');
+
 			yelpView.searchType(type, function(result) { // callback function - executes when Yelp data returned
-				self.displayList([]); // reset list before re-populate
-				for (var i = 0; i < result.businesses.length; i++) { // iterate through list and populate displayList()
+				self.displayList([]); // reset lists before re-populate
+				self.uniqueIdList([]); 
+
+				for (var i = 0; i < result.businesses.length; i++) { // iterate through list and populate displayList() / uniqueIdList()
 					self.displayList.push(result.businesses[i].name);
+					self.uniqueIdList.push(result.businesses[i].id);
 				}
+
 				$('#search-display').removeClass('hidden'); // hides loading spinner and shows search results
 				$('#search-loading').addClass('hidden');
 
@@ -103,7 +107,10 @@ function mapApp() {
 		};
 
 		// displays marker for specific business when name clicked
-		self.placeClick = function(name) {
+		self.placeClick = function(name, index) {
+			console.log(name);
+			console.log(self.uniqueIdList()[index]);
+
 			yelpView.searchName(name, function(result) {
 				mapView.createMarker(result.businesses[0]);
 			});
@@ -159,8 +166,7 @@ function mapApp() {
 			$('#search-box').off();
 		};
 
-		// TEST - TODO remove
-
+		// link to mapView - clear out all current markers
 		self.clearMarkers = function() {
 			mapView.clearMarkers();
 		};
@@ -250,8 +256,6 @@ function mapApp() {
 			self.forModel = {};
 			self.forModel[place.name] = self.marker; 
 			model.markers.push(self.forModel);
-			console.log(model.markers); // TODO - remove
-
 
 			self.setContent = function(content, place, context) {
 
@@ -280,11 +284,16 @@ function mapApp() {
 		clearMarkers: function() {
 			for (var i = 0; i < model.markers.length; i++) { // loop through markers in model data
 				console.log(model.markers[i]);
-				var currentMarker = model.markers[i][Object.keys(model.markers[i])[0]];
-				currentMarker.setMap(null); // set so do not display on map
+
+				// there will only ever be one pair of object values, however this allows key and value to be separated
+				for (var ref in model.markers[i]) {
+					var currentMarker = model.markers[i][ref]; // marker object
+					currentMarker.setMap(null); // set so do not display on map
+				}
 			}
 
-			model.markers = [];
+			// TODO - reset marker array to null??? 
+
 		}
 
 	};
