@@ -62,7 +62,7 @@ function mapApp() {
 
 		favouriteList: [],
 
-		markers: [] // holds current markers
+		markers: [] // holds current markers. Needs to be array as index is used for selection in Yelp API calls
 
 	};	
 
@@ -70,8 +70,7 @@ function mapApp() {
 	function appViewModel() {
 		var self = this; 
 
-		self.displayList = ko.observableArray(); // results shown in menu
-		self.uniqueIDList = ko.observableArray(); // for unique IDs - not shown in menu but used for other function calls
+		self.displayList = ko.observableArray(); // results shown in menu: includes name/ID/type
 
 		// search entered: carries out search using Yelp API and returns results in menu list
 		self.mainSearch = function(query) {
@@ -79,12 +78,16 @@ function mapApp() {
 			$('#search-loading').removeClass('hidden');
 
 			yelpView.searchAll(query, function(result) { // callback function - executes when Yelp data returned
-				self.displayList([]); // reset lists before re-populate
-				self.uniqueIDList([]); 
+				self.displayList([]); // reset list before re-populate
+				var tempItem; // holder var for current dataset
 
 				for (var i = 0; i < result.businesses.length; i++) { // iterate through list and populate displayList() / uniqueIdList()
-					self.displayList.push(result.businesses[i].name);
-					self.uniqueIDList.push(result.businesses[i].id);
+					tempItem = {
+						key: result.businesses[i].id,
+						name: result.businesses[i].name,
+						type: result.businesses[i].categories[0][0] // only get primary type, not array of options
+					};
+					self.displayList.push(tempItem);
 				}
 
 				$('#search-display').removeClass('hidden'); // hides loading spinner and shows search results
@@ -106,19 +109,15 @@ function mapApp() {
 			self.mainSearch(self.currentSearch()); // carries out actual search
 		};
 
-		// displays marker for specific business when name clicked
-		self.placeClick = function(name, index) {
-
-			var ID = self.uniqueIDList()[index];
-
+		// displays marker for specific business when name clicked, query by ID
+		self.placeClick = function(ID) {
 			yelpView.searchID(ID, function(result) {
-				console.log(result);
 				mapView.createMarker(result);
 			});
 		};
 
 		// favourite places implementation TODO - figure out how this works...
-		self.favourites = ko.observableArray(); // set observable to point to model data+
+		self.viewModelFavourites = ko.observableArray(); // set observable to point to model data+
 
 		// infoWindow data for bindings
 		self.infoWindowContent = {
@@ -131,21 +130,52 @@ function mapApp() {
 			address: ''
 		};
 
+		// parse values and pass to toggleFavourite()
+		// needed as menu returns this as an object rather than three separate values
+		self.menuFavourite = function(favourite) {
+			self.toggleFavourite(favourite.name, favourite.key, favourite.type);
+		};
+
 		// toggles whether a place is included in model.favouriteList
-		self.toggleFavourite = function(name) { // generic function to toggle whether a place name is included in favourites
-			var favouriteIndex = model.favouriteList.indexOf(name); // set value to index of matched name, or -1 if no match
+		// MUST pass in name, ID and type strings, in that order
+		self.toggleFavourite = function(name, ID, type) { // generic function to toggle whether a place name is included in favourites
 
-			if (favouriteIndex === -1) {
-				model.favouriteList.push(name); // add to array
+			// work out if key already in array
+			var previousIndex = null;
+			for (var i = 0; i < self.viewModelFavourites().length; i++) { // loop through favourites array
+				if (ID === self.viewModelFavourites()[i].key) {
+					previousIndex = i;
+					break;
+				}
 			}
-			else if (favouriteIndex >= 0) {
-				model.favouriteList.splice(favouriteIndex, 1); // remove from array
+
+			// if it is: remove object
+			if (previousIndex !== null) { // if value set i.e. already in favourites
+				self.viewModelFavourites().splice(previousIndex, 1); // delete object
 			}
+
+			// if it isn't: add new object
 			else {
-				self.errorHandler('The favourites functionality seems to have suffered a meltdown.'); // error handling
+				var newFavourite = {
+					key: ID,
+					name: name, 
+					type: type
+				};
+				self.viewModelFavourites().push(newFavourite); // push to model data
 			}
 
-			self.favourites(model.favouriteList.slice()); // update observable with model data
+			self.viewModelFavourites.valueHasMutated(); // force update of CSS
+		};
+
+		// takes ID - returns true if included in favourites, 
+		self.favouriteChecker = function(ID) {
+			console.log('Favourite Checker triggered');
+			for (var i = 0; i < self.viewModelFavourites().length; i++) { // loop through favourites array
+				if (ID === self.viewModelFavourites()[i].key) { // if ID supplied and favourites ID match
+					return true;
+				}
+			}
+			return false;
 		};
 
 		// error handling
@@ -250,7 +280,7 @@ function mapApp() {
 
 			// listen for clicks: bring content as Google Maps infoWindow
 			google.maps.event.addListener(self.marker, 'click', function() {
-				self.setContent(self.infoWindowTemplate, place, this);
+				self.openInfoWindow(self.infoWindowTemplate, place, this);
 			});
 
 			// populate array of current markers
@@ -258,7 +288,7 @@ function mapApp() {
 			self.forModel[place.name] = self.marker; 
 			model.markers.push(self.forModel);
 
-			self.setContent = function(content, place, context) {
+			self.openInfoWindow = function(content, place, context) {
 
 				// set infoWindow content in viewModel bindings
 				appViewModelContainer.infoWindowContent.name = place.name;
@@ -268,6 +298,9 @@ function mapApp() {
 				appViewModelContainer.infoWindowContent.rating = place.rating_img_url_large;
 				appViewModelContainer.infoWindowContent.mapLink = 'http://maps.google.com/?q=' + place.name + ',Edinburgh';
 				appViewModelContainer.infoWindowContent.address = place.location.address;
+				appViewModelContainer.infoWindowContent.ID = place.id; // not used for window but needed for favourite functionality
+				appViewModelContainer.infoWindowContent.type = place.categories[0][0]; // not used for window but needed for favourite functionality
+
 				
 				// set infoWindow content - includes binding to trigger template
 				mapView.infoWindow.setContent(content);

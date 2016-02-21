@@ -28,7 +28,7 @@
 			<hr>
 			<div data-bind="foreach: displayList" id="search-display">
 				<div class="place-container">
-					<div data-bind="text: $data, click: function(data, event) { $root.placeClick(data, $index()) }" class="place-name"></div><i data-bind="click: $root.toggleFavourite, css: { 'star-yellow': $root.favourites().indexOf($data) >= 0 }" class="fa fa-star star-menu"></i> <!-- Pass index -->
+					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div><i data-bind="click: function(data, event) { $root.menuFavourite($data) }, css: { 'star-yellow': $root.favouriteChecker($data.key) === true }" class="fa fa-star star-menu"></i> <!-- Pass index -->
 				</div>
 			</div>
 			<div id="search-loading" class="hidden">
@@ -41,9 +41,9 @@
 		<div id="favourites">
 			<p class="menu-heading">Favourite Places</p>
 			<hr>
-			<div data-bind="foreach: favourites">
+			<div data-bind="foreach: viewModelFavourites">
 				<div class="place-container">
-					<div data-bind="text: $data, click: $root.placeClick" class="place-name"></div><i data-bind="click: $root.toggleFavourite" class="fa fa-times"></i>
+					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div><i data-bind="click: function(data, event) { $root.menuFavourite($data) }" class="fa fa-times"></i>
 				</div>
 			</div>
 
@@ -82,7 +82,7 @@
 
 	<script type="text/html" id="infoWindow-template">
 		<h4 data-bind="text: name"></h4> 
-		<i class="fa fa-star star-black" data-bind="css: { 'star-yellow': $parent.favourites().indexOf(name) >= 0 }, click: $root.toggleFavourite.bind(this, name)"></i><br> <!-- bind() needed to prevent calling click function on load -->
+		<i class="fa fa-star star-black" data-bind="click: function(data, event) { $root.toggleFavourite(name, ID, type) }, css: { 'star-yellow': $root.favouriteChecker(ID) === true }"></i><br> <!-- bind() needed to prevent calling click function on load -->
 		<p class="info-copy" data-bind="text: copy"></p> 
 		<a data-bind="attr: { href: url }" target="_blank">Full review</a> 
 		<img class="info-photo" data-bind="attr: { src: photo }" alt="Place Image"></img> 
