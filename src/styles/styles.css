@@ -97,7 +97,6 @@ html, body, input {
 .map { /* Main map container */
   height: 100%;
   max-height: calc(100vh - 48px); /* Less height of top bar */
-  clear: both; /* Nothing can float around the map */
 }
 
 .search-container { /* div containing search bar */
@@ -287,6 +286,25 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .place-container > .fa-times:hover {
 	cursor: pointer;
 	color: red;
+}
+
+/* ======== Error handling ======== */
+
+.error-handler {
+	top: 100px;
+	text-align: center;
+	position: absolute;
+	display: none;
+	margin: 0 auto;
+	width: 100%;
+}
+
+.error-handler h4 {
+	font-weight: 700;
+}
+
+.show-error {
+	display: block !important; /* TODO - better to do this via knockout style binding? avoids !important class */
 }
 
 /* ======== Scrolling menu animations ======== */

@@ -121,6 +121,27 @@ function mapApp() {
 			self.favourites(model.favouriteList.slice()); // update observable with model data
 		};
 
+		self.errorToggle = ko.observable(0); // 0 for no error; 1 for error state
+		self.errorMessage = ko.observable(); // used for specific part erroring to customise error message
+
+		self.errorHandler = function(component) {
+			if (typeof component === 'string') { // custom error message. typeof needed to filter out knockout objects that may find their way in
+				self.errorMessage(component);
+			}
+
+			else { // generic error message
+				self.errorMessage('One of the moving parts seems to have thrown a wobbly.');
+			}
+
+			self.errorToggle(1); // triggers changes in display
+
+
+			$('#toggle-menu').off(); // remove event handlers
+			$('#toggle-favourites').off();
+			$('#search-box').off();
+
+		};
+
 	}
 
 	// applies bindings to a variable so functions can be referenced by other parts of app i.e. not just DOM bindings
@@ -211,7 +232,7 @@ function mapApp() {
 				appViewModelContainer.infoWindowContent.url = place.url;
 				appViewModelContainer.infoWindowContent.photo = place.image_url;
 				appViewModelContainer.infoWindowContent.rating = place.rating_img_url_large;
-				appViewModelContainer.infoWindowContent.url = 'http://maps.google.com/?q=' + place.name + ',Edinburgh';
+				appViewModelContainer.infoWindowContent.mapLink = 'http://maps.google.com/?q=' + place.name + ',Edinburgh';
 				appViewModelContainer.infoWindowContent.address = place.location.address;
 				
 				// set infoWindow content - includes binding to trigger template
@@ -384,7 +405,7 @@ function mapApp() {
 		// if menu not open - open it
 		// if menu open - pulse animation
 		searchListener: function() {
-			$('#search-box').submit(function() {
+			$('#search-box').on('submit', function() {
 
 				var menu = $('#menu');
 
