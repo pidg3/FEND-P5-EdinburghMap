@@ -108,8 +108,6 @@ function mapApp() {
 		// displays marker for specific business when name clicked, query by ID
 		self.placeClick = function(ID) {
 			
-			console.log(model.markers); // TODO - remove
-
 			var alreadyMarker = false;
 
 			for (var i = 0; i < model.markers.length; i++) { // loop through existing markers
@@ -184,7 +182,7 @@ function mapApp() {
 		// takes ID - returns true if included in favourites
 		// used for bindings - needs valueHasMutated() to force refresh of CSS
 		self.favouriteChecker = function(ID) {
-			console.log('Favourite Checker triggered');
+
 			for (var i = 0; i < self.viewModelFavourites().length; i++) { // loop through favourites array
 				if (ID === self.viewModelFavourites()[i].key) { // if ID supplied and favourites ID match
 					return true;
@@ -254,8 +252,17 @@ function mapApp() {
 			
 			var self = this;
 
-			console.log(place);
+			console.log(place); // TODO - remove (useful for debugging in dev)
 
+			// remove any pre-existing animation: takes out bug where markers can get stuck in infinite loop
+			for (var k = 0; k < model.markers.length; k++) {
+
+				// there will only ever be one pair of object values, however this allows key and value to be separated
+				for (var refMarker in model.markers[k]) {
+					model.markers[k][refMarker].setAnimation(null); // reset animation
+				}
+			}
+					
 			self.currentIcon = '';
 
 			// loop through Yelp object categories and match to matrix of images in model
@@ -308,7 +315,7 @@ function mapApp() {
 
 			// populate array of current markers
 			self.forModel = {};
-			self.forModel[place.name] = self.marker; 
+			self.forModel[place.name] = self.marker; // key: name, value: marker content
 			model.markers.push(self.forModel);
 
 			self.openInfoWindow = function(content, place, context) {
@@ -346,7 +353,6 @@ function mapApp() {
 			// loop through markers in model data
 			// iterate backwards as allows splice() to be used to remove items without corrupting index
 			for (var i = model.markers.length; i >= 0; i--) { 
-				console.log(model.markers[i]);
 
 				inFavourites = false; // reset
 
@@ -503,8 +509,6 @@ function mapApp() {
 
 		favouritesListener: function() {
 			$('#toggle-favourites').on('click', function() {
-
-				console.log('Favourites clicked');
 
 				var favourites = $('#favourites');
 
