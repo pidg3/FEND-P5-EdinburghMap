@@ -167,7 +167,8 @@ function mapApp() {
 			self.viewModelFavourites.valueHasMutated(); // force update of CSS
 		};
 
-		// takes ID - returns true if included in favourites, 
+		// takes ID - returns true if included in favourites
+		// used for bindings - needs valueHasMutated() to force refresh of CSS
 		self.favouriteChecker = function(ID) {
 			console.log('Favourite Checker triggered');
 			for (var i = 0; i < self.viewModelFavourites().length; i++) { // loop through favourites array
