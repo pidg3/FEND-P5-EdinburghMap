@@ -117,7 +117,7 @@ function mapApp() {
 			var alreadyMarker = false;
 
 			for (var i = 0; i < model.markers.length; i++) { // loop through existing markers
-				if (model.markers[i][Object.keys(model.markers[i])[0]].id === ID) { // marker already on map 
+				if (model.markers[i][Object.keys(model.markers[i])[0]].id === ID) { // marker already on map
 					alreadyMarker = true;
 				}
 			}
@@ -340,13 +340,32 @@ function mapApp() {
 
 		// clear all markers TODO - build in functionality to leave favourites alone (differnt colour?)
 		clearMarkers: function() {
-			for (var i = 0; i < model.markers.length; i++) { // loop through markers in model data
+
+			var inFavourites; // used to determine whether value in favourites array
+			var currentMarker;
+
+			// loop through markers in model data
+			// iterate backwards as allows splice() to be used to remove items without corrupting index
+			for (var i = model.markers.length; i >= 0; i--) { 
 				console.log(model.markers[i]);
 
+				inFavourites = false; // reset
+
 				// there will only ever be one pair of object values, however this allows key and value to be separated
-				for (var ref in model.markers[i]) {
-					var currentMarker = model.markers[i][ref]; // marker object
-					currentMarker.setMap(null); // set so do not display on map
+				for (var refMarker in model.markers[i]) {
+					currentMarker = model.markers[i][refMarker]; // marker object
+
+					for (var refFav in appViewModelContainer.viewModelFavourites()) { // loop through favourites
+						if (appViewModelContainer.viewModelFavourites()[refFav].key === currentMarker.id) {
+							inFavourites = true;
+							break; // exit for loop
+						}
+					}
+
+					if (inFavourites === false) {
+						currentMarker.setMap(null); // set so do not display on map
+						model.markers.splice(i, 1); // remove from marker array
+					}
 				}
 			}
 
