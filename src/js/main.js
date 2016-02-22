@@ -27,38 +27,34 @@ function mapApp() {
 	var model = {
 
 		// there isn't a high-level category in the yelp API e.g. restaurants
-		// this is annoying and has resulted in the hacky-feeling list below
-		// TODO: find better way of managing this
-		iconLibrary: { 
-			'pubs': '../images/bar.png',
-			'bars': '../images/bar.png',
-			'cafes': '../images/cafe.png',
-			'coffee': '../images/cafe.png',
-			'tea': '../images/cafe.png',
-			'galleries': '../images/museum.png',
-			'museums': '../images/museum.png',	
-			'landmarks': '../images/museum.png',
-			'indian': '../images/restaurant.png',
-			'indpak': '../images/restaurant.png',
-			'mexican': '../images/restaurant.png',
-			'french': '../images/restaurant.png',
-			'gastropub': '../images/restaurant.png',
-			'english': '../images/restaurant.png',
-			'scottish': '../images/restaurant.png',
-			'turkish': '../images/restaurant.png',
-			'italian': '../images/restaurant.png',
-			'steak': '../images/restaurant.png',
-			'burgers': '../images/restaurant.png',
-			'seafood': '../images/restaurant.png',
-			'british': '../images/restaurant.png',
-			'modern_european': '../images/restaurant.png',
-			'sandwiches': '../images/restaurant.png',
-			'vegetarian': '../images/restaurant.png',
-			'football': '../images/sports.png',
-			'stadiumsarenas': '../images/sports.png'
+		// therefore this mapping table is required
+		iconLibrary: {
+			Bars: {
+				imgBlack: '../images/bar.png',
+				yelpRefs: ['pubs', 'bars', 'cocktailbars']
+			},
+			Cafes: {
+				imgBlack: '../images/cafe.png',
+				yelpRefs: ['cafes', 'coffee', 'tea']
+			},
+			Attractions: {
+				imgBlack: '../images/museum.png',
+				yelpRefs: ['galleries', 'museums', 'landmarks']
+			},
+			Restaurants: {
+				imgBlack: '../images/museum.png',
+				yelpRefs: ['indian', 'indpak', 'mexican','french', 'gastropub', 'english', 'scottish', 'tuskish', 'italian','steak', 'burgers', 'seafood',
+				'british', 'modern_european', 'sandwiches','vegetarian', 'japanese', 'chinese']
+			},
+			Sports: {
+				imgBlack: '../images/sports.png',
+				yelpRefs: ['football', 'stadiumsarenas']
+			}
 		},
 
-		defaultIcon: '../images/other.png', // used if cannot find a match with other icons
+		defaultIcon: { // used if cannot find a match with other icons
+			imgBlack: '../images/other.png'
+		}, 
 
 		favouriteList: [],
 
@@ -263,24 +259,27 @@ function mapApp() {
 			self.currentIcon = '';
 
 			// loop through Yelp object categories and match to matrix of images in model
-			// two loops required due to JSON structure
 			// break out of both loops if match found
-			for (var i = 0; i < place.categories.length; i++) { 
-				for (var ref in model.iconLibrary) {
-					if (place.categories[i][1] === ref) {
-						self.currentIcon = model.iconLibrary[ref];
+			for (var i = 0; i < place.categories.length; i++) {  // loop through categories in specific place object returned
+				for (var categoryRef in model.iconLibrary) { // loop through outer iconLibrary object
+					for (var j = 0; j < model.iconLibrary[categoryRef].yelpRefs.length; j++) { // loop through yelp categories array
+						if (place.categories[i][1] === model.iconLibrary[categoryRef].yelpRefs[j]) { // if specific place category matches iconLibrary category
+							self.currentIcon = model.iconLibrary[categoryRef].imgBlack; // set to correct icon
+							break; // no further searching necessary - break out of loop (performance boost)
+						}
+					}
+					if (self.currentIcon !== '') { // no further searching necessary - break out of loop (performance boost)
 						break;
 					}
 				}
-				if (self.currentIcon !== '') {
+				if (self.currentIcon !== '') { // no further searching necessary - break out of loop (performance boost)
 					break;
 				}
-
 			}
 
 			// if match not found, set to default symbol
 			if (self.currentIcon === '') { 
-				self.currentIcon = model.defaultIcon;
+				self.currentIcon = model.defaultIcon.imgBlack;
 			}
 
 			// get location from Yelp object
