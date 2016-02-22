@@ -111,9 +111,27 @@ function mapApp() {
 
 		// displays marker for specific business when name clicked, query by ID
 		self.placeClick = function(ID) {
-			yelpView.searchID(ID, function(result) {
-				mapView.createMarker(result);
-			});
+			
+			console.log(model.markers); // TODO - remove
+
+			var alreadyMarker = false;
+
+			for (var i = 0; i < model.markers.length; i++) { // loop through existing markers
+				if (model.markers[i][Object.keys(model.markers[i])[0]].id === ID) { // marker already on map 
+					alreadyMarker = true;
+				}
+			}
+
+			if (alreadyMarker === false) {
+				yelpView.searchID(ID, function(result) { // create new marker via Yelp callback
+					mapView.createMarker(result); 
+				});
+			}
+
+			else if (alreadyMarker === true) {
+				console.log('already a marker'); // TODO - replace with functionality to open infoWindow
+			}
+
 		};
 
 		// favourite places implementation TODO - figure out how this works...
@@ -272,15 +290,20 @@ function mapApp() {
 			self.marker = new google.maps.Marker({
 				map: mapClosure, 
 				position: self.placeLoc,
-				animation: google.maps.Animation.DROP, // TODO - replace with BOUNCE with timeout due to issues with animation
-				icon: self.currentIcon // custom variable marker as defined above
+				animation: google.maps.Animation.BOUNCE,
+				icon: self.currentIcon, // custom variable marker as defined above
+				id: place.id
 			});
+			setTimeout(function(){ self.marker.setAnimation(null); }, 750); // animations plays once only
+
 
 			// pre-set content of infoWindow
 			self.infoWindowTemplate = '<div class="info-content" id="info-window" data-bind="template: { name: \'infoWindow-template\', data: infoWindowContent }"></div>';
 
 			// listen for clicks: bring content as Google Maps infoWindow
 			google.maps.event.addListener(self.marker, 'click', function() {
+				self.marker.setAnimation(google.maps.Animation.BOUNCE); // start animation
+				setTimeout(function(){ self.marker.setAnimation(null); }, 750); // animations plays once only
 				self.openInfoWindow(self.infoWindowTemplate, place, this);
 			});
 
