@@ -42,12 +42,10 @@
 			<p class="menu-heading">Favourite Places</p>
 			<i class="fa fa-filter" data-bind="click: toggleFilter"></i>
 			<hr>
-			<form data-bind="css: { 'hidden': toggleFilterSwitcher() === false }" id="search-box">
-			    <input type="search" id="search" data-bind="value: searchQuery">
-			    <span class="icon"><i class="fa fa-search"></i></span> <!-- TODO - back to searchBox -->
-				<submit>
+			<div data-bind="css: { 'hidden': toggleFilterSwitcher() === false }">
+			    <input type="search" id="search" data-bind="value: currentFilter">
 				<hr>
-		    </form>
+		    </div>
 			<div data-bind="foreach: viewModelFavourites">
 				<div class="place-container">
 					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div><i data-bind="click: function(data, event) { $root.menuFavourite($data) }" class="fa fa-times"></i>
@@ -64,11 +62,10 @@
 		<i id="toggle-favourites" class="fa fa-star fa-3x"></i>
 		<i id="clear-markers" class="fa fa-times fa-3x" data-bind="click: clearMarkers"></i> <!-- TODO - remote temp icon, for debug only -->
 
-
 		<div class="search-container">
 		    <form data-bind="submit: searchBox" id="search-box">
 			    <input type="search" id="search" data-bind="value: searchQuery">
-			    <span data-bind="click: searchBox" class="icon"><i class="fa fa-search"></i></span> <!-- TODO - back to searchBox -->
+			    <span data-bind="click: searchBox" class="icon"><i class="fa fa-search"></i></span>
 				<submit>
 		    </form>
 		</div>

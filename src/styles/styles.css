@@ -273,12 +273,7 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	cursor: pointer;
 	color: #686868;
 }
-.menu-visible .icon { /* Magnifying glass symbol */
-  position: absolute;
-  right: 35px;
-  top: 77px;
-  color: #4f5b66;
-}
+
 
 .place-container > .place-name {
 	float: left;

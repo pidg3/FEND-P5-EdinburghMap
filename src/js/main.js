@@ -234,9 +234,9 @@ function mapApp() {
 
 		// ======== Favourites filter ========
 
+		// display
 		self.toggleFilterSwitcher = ko.observable(false); // true = favourites filter displayed
 		self.toggleFilter = function() {
-			console.log('run');
 			if (self.toggleFilterSwitcher() === false) {
 				self.toggleFilterSwitcher(true);
 			}
@@ -245,8 +245,14 @@ function mapApp() {
 			}
 		};
 
+		self.currentFilter = ko.observable(); // value typed into filter box
+
+		self.filteredFavourites = ko.computed(function() {
+			// TBC
+		});
+
 		// ======== Error handling ========
-		
+
 		self.errorToggle = ko.observable(0); // 0 for no error; 1 for error state
 		self.errorMessage = ko.observable(); // used for specific part erroring to customise error message
 		self.errorHandler = function(component) {
