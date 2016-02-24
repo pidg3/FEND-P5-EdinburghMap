@@ -29,38 +29,43 @@ function mapApp() {
 		// there isn't a high-level category in the yelp API e.g. restaurants
 		// therefore this mapping table is required
 		iconLibrary: {
-			bars: {
+			Bars: {
 				name: 'Bars',
 				imgBlack: '../images/bar.png',
 				imgFav: '../images/bar-fav.png',
 				yelpRefs: ['pubs', 'bars', 'cocktailbars']
 			},
-			cafes: {
+			Cafes: {
 				name: 'Cafes',
 				imgBlack: '../images/cafe.png',
+				imgFav: '../images/bar-fav.png',
 				yelpRefs: ['cafes', 'coffee', 'tea']
 			},
-			attractions: {
+			Attractions: {
 				name: 'Attractions',
 				imgBlack: '../images/museum.png',
+				imgFav: '../images/bar-fav.png',
 				yelpRefs: ['galleries', 'museums', 'landmarks']
 			},
-			restaurants: {
+			Restaurants: {
 				name: 'Restaurants',
 				imgBlack: '../images/museum.png',
+				imgFav: '../images/bar-fav.png',
 				yelpRefs: ['indian', 'indpak', 'mexican','french', 'gastropub', 'english', 'scottish', 'tuskish', 'italian','steak', 'burgers', 'seafood',
 				'british', 'modern_european', 'sandwiches','vegetarian', 'japanese', 'chinese']
 			},
-			sports: {
+			Sports: {
 				name: 'Sports',
 				imgBlack: '../images/sports.png',
+				imgFav: '../images/bar-fav.png',
 				yelpRefs: ['football', 'stadiumsarenas']
 			}
 		},
 
-		defaultIcon: { // used if cannot find a match with other icons
+		Other: { // used if cannot find a match with other icons
 			name: 'Other',
-			imgBlack: '../images/other.png'
+			imgBlack: '../images/other.png',
+			imgFav: '../images/bar-fav.png'
 		}, 
 
 		favouriteList: [],
@@ -88,7 +93,7 @@ function mapApp() {
 					tempItem = {
 						key: result.businesses[i].id,
 						name: result.businesses[i].name,
-						type: result.businesses[i].categories[0][0] // only get primary type, not array of options
+						type: result.businesses[i].categories[0][1] // only get primary type, not array of options
 					};
 					self.displayList.push(tempItem);
 				}
@@ -100,8 +105,8 @@ function mapApp() {
 		};
 
 		// holds search query for entry into searchBox() function below
-		self.searchQuery = ko.observable(); 
-
+		self.searchQuery = ko.observable();
+ 
 		// set by search query, only used for display via binding, allows reset of search box text between queries
 		self.currentSearch = ko.observable('Search for something to get started...'); 
 
@@ -154,13 +159,37 @@ function mapApp() {
 
 		// parse values and pass to toggleFavourite()
 		// needed as menu returns this as an object rather than three separate values
+		// also need to get 'type' into one of required categories (so toggleFavourite can update marker image)
 		self.menuFavourite = function(favourite) {
-			self.toggleFavourite(favourite.name, favourite.key, favourite.type);
+
+			var mainType = ''; // used for type category as listed in model
+
+			for (var categoryRef in model.iconLibrary) { // loop through outer iconLibrary object
+				for (var i = 0; i < model.iconLibrary[categoryRef].yelpRefs.length; i++) { // loop through yelp categories array
+					if (favourite.type === model.iconLibrary[categoryRef].yelpRefs[i]) { // if specific place category matches iconLibrary category
+						mainType = model.iconLibrary[categoryRef].name;	 // set to correct name as defined in model
+						break; // no further searching necessary - break out of loop (performance boost)
+					}
+				}
+				if (mainType !== '') { // no further searching necessary - break out of loop (performance boost)
+					break;
+				}
+			}
+
+			if (mainType === '') {
+				mainType = model.Other.name;
+			}
+
+
+			self.toggleFavourite(favourite.name, favourite.key, mainType);
 		};
 
 		// toggles whether a place is included in model.favouriteList
 		// MUST pass in name, ID and type strings, in that order
 		self.toggleFavourite = function(name, ID, type) { // generic function to toggle whether a place name is included in favourites
+
+
+			console.log(type);
 
 			// work out if key already in array
 			var previousIndex = null;
@@ -171,12 +200,12 @@ function mapApp() {
 				}
 			}
 
-			// if it is: remove object
+			// if it is: remove object and set image to black
 			if (previousIndex !== null) { // if value set i.e. already in favourites
 				self.viewModelFavourites().splice(previousIndex, 1); // delete object
 			}
 
-			// if it isn't: add new object
+			// if it isn't: add new object and set image to white
 			else {
 				var newFavourite = {
 					key: ID,
@@ -186,7 +215,9 @@ function mapApp() {
 				self.viewModelFavourites().push(newFavourite); // push to model data
 			}
 
-			self.viewModelFavourites.valueHasMutated(); // force update of CSS
+			self.viewModelFavourites.valueHasMutated(); // force update of CSS for stars to change colour
+
+			console.log(self.viewModelFavourites());
 		};
 
 		// takes ID - returns true if included in favourites
@@ -298,7 +329,8 @@ function mapApp() {
 
 			// if match not found, set to default symbol
 			if (self.iconURL === '') { 
-				self.iconURL = model.defaultIcon.imgBlack;
+				self.type = model.Other.name;
+				self.iconURL = model.Other.imgBlack;
 			}
 
 			// get location from Yelp object
@@ -322,6 +354,8 @@ function mapApp() {
 			// listen for clicks: bring content as Google Maps infoWindow
 			google.maps.event.addListener(self.marker, 'click', function() {
 				var currentMarker = this;
+				console.log('click callback');
+				console.log(self.type);
 				mapView.animateMarker(currentMarker); // marker bounces once on click
 				self.openInfoWindow(self.infoWindowTemplate, place, currentMarker);
 			});
@@ -343,6 +377,7 @@ function mapApp() {
 				appViewModelContainer.infoWindowContent.address = place.location.address;
 
 				appViewModelContainer.infoWindowContent.ID = place.id; // not used for window but needed for favourite functionality
+				appViewModelContainer.infoWindowContent.type = self.type;
 
 				// set infoWindow content - includes binding to trigger template
 				mapView.infoWindow.setContent(content);
@@ -389,9 +424,7 @@ function mapApp() {
 					}
 				}
 			}
-
 			// TODO - reset marker array to null??? 
-
 		}
 
 	};
