@@ -232,7 +232,21 @@ function mapApp() {
 			return false;
 		};
 
-		// error handling
+		// ======== Favourites filter ========
+
+		self.toggleFilterSwitcher = ko.observable(false); // true = favourites filter displayed
+		self.toggleFilter = function() {
+			console.log('run');
+			if (self.toggleFilterSwitcher() === false) {
+				self.toggleFilterSwitcher(true);
+			}
+			else {
+				self.toggleFilterSwitcher(false);
+			}
+		};
+
+		// ======== Error handling ========
+		
 		self.errorToggle = ko.observable(0); // 0 for no error; 1 for error state
 		self.errorMessage = ko.observable(); // used for specific part erroring to customise error message
 		self.errorHandler = function(component) {

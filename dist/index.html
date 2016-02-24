@@ -40,7 +40,14 @@
 	<div class="interface-container"> <!-- Favourites list -->
 		<div id="favourites">
 			<p class="menu-heading">Favourite Places</p>
+			<i class="fa fa-filter" data-bind="click: toggleFilter"></i>
 			<hr>
+			<form data-bind="css: { 'hidden': toggleFilterSwitcher() === false }" id="search-box">
+			    <input type="search" id="search" data-bind="value: searchQuery">
+			    <span class="icon"><i class="fa fa-search"></i></span> <!-- TODO - back to searchBox -->
+				<submit>
+				<hr>
+		    </form>
 			<div data-bind="foreach: viewModelFavourites">
 				<div class="place-container">
 					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div><i data-bind="click: function(data, event) { $root.menuFavourite($data) }" class="fa fa-times"></i>

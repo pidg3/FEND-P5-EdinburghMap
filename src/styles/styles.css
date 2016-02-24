@@ -64,6 +64,10 @@ html, body, input {
 	color: #252525;
 }
 
+hr {
+	clear: both; /* hr always acts as separator */
+}
+
 .hidden { /* for hiding divs, loading time etc */
 	display: none;
 }
@@ -119,9 +123,11 @@ html, body, input {
   color: #4f5b66;
 }
 
+
 .search-container .icon:hover { /* Magnifying glass symbol */
 	cursor: pointer;
 	color: #686868;
+
 
 }
 
@@ -251,6 +257,27 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .menu-heading {
 	font-weight: 700;
 	margin: 16px 0 16px 0;
+	float: left;
+}
+
+.menu-bar {
+	clear: both;
+}
+
+.menu-visible > .fa-filter { /* Filter icon - favourites only */
+	font-size: 28px;
+	float: right;
+	padding: 10px;
+}
+.menu-visible > .fa-filter:hover {
+	cursor: pointer;
+	color: #686868;
+}
+.menu-visible .icon { /* Magnifying glass symbol */
+  position: absolute;
+  right: 35px;
+  top: 77px;
+  color: #4f5b66;
 }
 
 .place-container > .place-name {
