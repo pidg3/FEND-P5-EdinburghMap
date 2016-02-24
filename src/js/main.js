@@ -116,10 +116,13 @@ function mapApp() {
 		self.placeClick = function(ID) {
 			
 			var alreadyMarker = false;
+			var currentMarker;
 
 			for (var i = 0; i < model.markers.length; i++) { // loop through existing markers
 				if (model.markers[i][Object.keys(model.markers[i])[0]].id === ID) { // marker already on map
 					alreadyMarker = true;
+					currentMarker = model.markers[i][Object.keys(model.markers[i])[0]]; // marker object
+					break;
 				}
 			}
 
@@ -130,7 +133,7 @@ function mapApp() {
 			}
 
 			else if (alreadyMarker === true) {
-				console.log('already a marker'); // TODO - replace with functionality to open infoWindow
+				mapView.animateMarker(currentMarker);
 			}
 
 		};
@@ -319,8 +322,7 @@ function mapApp() {
 			// listen for clicks: bring content as Google Maps infoWindow
 			google.maps.event.addListener(self.marker, 'click', function() {
 				var currentMarker = this;
-				currentMarker.setAnimation(google.maps.Animation.BOUNCE); // start animation
-				setTimeout(function(){ currentMarker.setAnimation(null); }, 750); // animations plays once only
+				mapView.animateMarker(currentMarker); // marker bounces once on click
 				self.openInfoWindow(self.infoWindowTemplate, place, currentMarker);
 			});
 
@@ -353,6 +355,10 @@ function mapApp() {
 			};
 		},
 
+		animateMarker: function(marker) {
+			marker.setAnimation(google.maps.Animation.BOUNCE); // start animation
+			setTimeout(function(){ marker.setAnimation(null); }, 750); // animations plays once only	
+		},
 
 		// clear all markers TODO - build in functionality to leave favourites alone (differnt colour?)
 		clearMarkers: function() {
