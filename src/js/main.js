@@ -29,30 +29,37 @@ function mapApp() {
 		// there isn't a high-level category in the yelp API e.g. restaurants
 		// therefore this mapping table is required
 		iconLibrary: {
-			Bars: {
+			bars: {
+				name: 'Bars',
 				imgBlack: '../images/bar.png',
+				imgFav: '../images/bar-fav.png',
 				yelpRefs: ['pubs', 'bars', 'cocktailbars']
 			},
-			Cafes: {
+			cafes: {
+				name: 'Cafes',
 				imgBlack: '../images/cafe.png',
 				yelpRefs: ['cafes', 'coffee', 'tea']
 			},
-			Attractions: {
+			attractions: {
+				name: 'Attractions',
 				imgBlack: '../images/museum.png',
 				yelpRefs: ['galleries', 'museums', 'landmarks']
 			},
-			Restaurants: {
+			restaurants: {
+				name: 'Restaurants',
 				imgBlack: '../images/museum.png',
 				yelpRefs: ['indian', 'indpak', 'mexican','french', 'gastropub', 'english', 'scottish', 'tuskish', 'italian','steak', 'burgers', 'seafood',
 				'british', 'modern_european', 'sandwiches','vegetarian', 'japanese', 'chinese']
 			},
-			Sports: {
+			sports: {
+				name: 'Sports',
 				imgBlack: '../images/sports.png',
 				yelpRefs: ['football', 'stadiumsarenas']
 			}
 		},
 
 		defaultIcon: { // used if cannot find a match with other icons
+			name: 'Other',
 			imgBlack: '../images/other.png'
 		}, 
 
@@ -262,8 +269,9 @@ function mapApp() {
 					model.markers[k][refMarker].setAnimation(null); // reset animation
 				}
 			}
-					
-			self.currentIcon = '';
+				
+			self.type; // place type as per definitions in model
+			self.iconURL = '';
 
 			// loop through Yelp object categories and match to matrix of images in model
 			// break out of both loops if match found
@@ -271,22 +279,23 @@ function mapApp() {
 				for (var categoryRef in model.iconLibrary) { // loop through outer iconLibrary object
 					for (var j = 0; j < model.iconLibrary[categoryRef].yelpRefs.length; j++) { // loop through yelp categories array
 						if (place.categories[i][1] === model.iconLibrary[categoryRef].yelpRefs[j]) { // if specific place category matches iconLibrary category
-							self.currentIcon = model.iconLibrary[categoryRef].imgBlack; // set to correct icon
+							self.type = model.iconLibrary[categoryRef].name;
+							self.iconURL = model.iconLibrary[categoryRef].imgBlack; // set to correct icon
 							break; // no further searching necessary - break out of loop (performance boost)
 						}
 					}
-					if (self.currentIcon !== '') { // no further searching necessary - break out of loop (performance boost)
+					if (self.iconURL !== '') { // no further searching necessary - break out of loop (performance boost)
 						break;
 					}
 				}
-				if (self.currentIcon !== '') { // no further searching necessary - break out of loop (performance boost)
+				if (self.iconURL !== '') { // no further searching necessary - break out of loop (performance boost)
 					break;
 				}
 			}
 
 			// if match not found, set to default symbol
-			if (self.currentIcon === '') { 
-				self.currentIcon = model.defaultIcon.imgBlack;
+			if (self.iconURL === '') { 
+				self.iconURL = model.defaultIcon.imgBlack;
 			}
 
 			// get location from Yelp object
@@ -297,8 +306,9 @@ function mapApp() {
 				map: mapClosure, 
 				position: self.placeLoc,
 				animation: google.maps.Animation.BOUNCE,
-				icon: self.currentIcon, // custom variable marker as defined above
-				id: place.id
+				icon: self.iconURL, // custom variable marker as defined above
+				id: place.id, // needed for favourites functionality
+				type: self.type // needed for favourites functionality
 			});
 			setTimeout(function(){ self.marker.setAnimation(null); }, 750); // animations plays once only
 
@@ -308,9 +318,10 @@ function mapApp() {
 
 			// listen for clicks: bring content as Google Maps infoWindow
 			google.maps.event.addListener(self.marker, 'click', function() {
-				self.marker.setAnimation(google.maps.Animation.BOUNCE); // start animation
-				setTimeout(function(){ self.marker.setAnimation(null); }, 750); // animations plays once only
-				self.openInfoWindow(self.infoWindowTemplate, place, this);
+				var currentMarker = this;
+				currentMarker.setAnimation(google.maps.Animation.BOUNCE); // start animation
+				setTimeout(function(){ currentMarker.setAnimation(null); }, 750); // animations plays once only
+				self.openInfoWindow(self.infoWindowTemplate, place, currentMarker);
 			});
 
 			// populate array of current markers
@@ -328,10 +339,9 @@ function mapApp() {
 				appViewModelContainer.infoWindowContent.rating = place.rating_img_url_large;
 				appViewModelContainer.infoWindowContent.mapLink = 'http://maps.google.com/?q=' + place.name + ',Edinburgh';
 				appViewModelContainer.infoWindowContent.address = place.location.address;
-				appViewModelContainer.infoWindowContent.ID = place.id; // not used for window but needed for favourite functionality
-				appViewModelContainer.infoWindowContent.type = place.categories[0][0]; // not used for window but needed for favourite functionality
 
-				
+				appViewModelContainer.infoWindowContent.ID = place.id; // not used for window but needed for favourite functionality
+
 				// set infoWindow content - includes binding to trigger template
 				mapView.infoWindow.setContent(content);
 
