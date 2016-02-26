@@ -38,26 +38,26 @@ function mapApp() {
 			Cafes: {
 				name: 'Cafes',
 				imgBlack: '../images/cafe.png',
-				imgFav: '../images/bar-fav.png',
+				imgFav: '../images/cafe-fav.png',
 				yelpRefs: ['cafes', 'coffee', 'tea']
 			},
 			Attractions: {
 				name: 'Attractions',
-				imgBlack: '../images/museum.png',
-				imgFav: '../images/bar-fav.png',
+				imgBlack: '../images/attraction.png',
+				imgFav: '../images/attraction-fav.png',
 				yelpRefs: ['galleries', 'museums', 'landmarks']
 			},
 			Restaurants: {
 				name: 'Restaurants',
-				imgBlack: '../images/museum.png',
-				imgFav: '../images/bar-fav.png',
+				imgBlack: '../images/restaurant.png',
+				imgFav: '../images/restaurant-fav.png',
 				yelpRefs: ['indian', 'indpak', 'mexican','french', 'gastropub', 'english', 'scottish', 'tuskish', 'italian','steak', 'burgers', 'seafood',
 				'british', 'modern_european', 'sandwiches','vegetarian', 'japanese', 'chinese']
 			},
 			Sports: {
 				name: 'Sports',
 				imgBlack: '../images/sports.png',
-				imgFav: '../images/bar-fav.png',
+				imgFav: '../images/sports-fav.png',
 				yelpRefs: ['football', 'stadiumsarenas']
 			}
 		},
@@ -65,7 +65,7 @@ function mapApp() {
 		Other: { // used if cannot find a match with other icons
 			name: 'Other',
 			imgBlack: '../images/other.png',
-			imgFav: '../images/bar-fav.png'
+			imgFav: '../images/other-fav.png'
 		}, 
 
 		favouriteList: [],
@@ -188,21 +188,36 @@ function mapApp() {
 		// MUST pass in name, ID and type strings, in that order
 		self.toggleFavourite = function(name, ID, type) { // generic function to toggle whether a place name is included in favourites
 
-
-			console.log(type);
-
-			// work out if key already in array
-			var previousIndex = null;
+			// work out if key already in favourites array
+			var favIndex = null;
 			for (var i = 0; i < self.viewModelFavourites().length; i++) { // loop through favourites array
 				if (ID === self.viewModelFavourites()[i].key) {
-					previousIndex = i;
+					favIndex = i;
 					break;
 				}
 			}
 
+			// work out if key already in marker array
+			var markerIndex = null;
+			for (var j = 0; j < model.markers.length; j++) { // loop through marker array
+				if (model.markers[j][ID] !== null && model.markers[j][ID] !== undefined) { // if a marker exists with this ID
+					markerIndex = j;
+					break;
+				}
+			}
+
+			console.log(markerIndex);
+
 			// if it is: remove object and set image to black
-			if (previousIndex !== null) { // if value set i.e. already in favourites
-				self.viewModelFavourites().splice(previousIndex, 1); // delete object
+			if (favIndex !== null) { // if value set i.e. already in favourites
+				self.viewModelFavourites().splice(favIndex, 1); // delete object
+				if (markerIndex !== null) {
+					if (type !== 'Other') {
+						model.markers[markerIndex][ID].setIcon(model.iconLibrary[type].imgBlack); // set to correct icon based on type
+					}
+					else {
+						model.markers[markerIndex][ID].setIcon(model.Other.imgBlack);
+					}				}
 			}
 
 			// if it isn't: add new object and set image to white
@@ -213,11 +228,19 @@ function mapApp() {
 					type: type
 				};
 				self.viewModelFavourites().push(newFavourite); // push to model data
+				if (markerIndex !== null) {
+					if (type !== 'Other') {
+						model.markers[markerIndex][ID].setIcon(model.iconLibrary[type].imgFav); // set to correct icon based on type
+					}
+					else {
+						model.markers[markerIndex][ID].setIcon(model.Other.imgFav);
+					}
+				}
 			}
 
 			self.viewModelFavourites.valueHasMutated(); // force update of CSS for stars to change colour
 
-			console.log(self.viewModelFavourites());
+			console.log(model.markers);
 		};
 
 		// takes ID - returns true if included in favourites
@@ -356,7 +379,7 @@ function mapApp() {
 					for (var j = 0; j < model.iconLibrary[categoryRef].yelpRefs.length; j++) { // loop through yelp categories array
 						if (place.categories[i][1] === model.iconLibrary[categoryRef].yelpRefs[j]) { // if specific place category matches iconLibrary category
 							self.type = model.iconLibrary[categoryRef].name;
-							self.iconURL = model.iconLibrary[categoryRef].imgBlack; // set to correct icon
+							self.iconURL = model.iconLibrary[categoryRef]; // prepare to set to correct icon
 							break; // no further searching necessary - break out of loop (performance boost)
 						}
 					}
@@ -372,8 +395,24 @@ function mapApp() {
 			// if match not found, set to default symbol
 			if (self.iconURL === '') { 
 				self.type = model.Other.name;
-				self.iconURL = model.Other.imgBlack;
+				self.iconURL = model.Other; // prepare to set to correct icon
 			}
+
+			// set to white or black depending on whether in favourites array
+			var inFavourites = false;
+			for (var m = 0; m < appViewModelContainer.viewModelFavourites().length; m++) { // loop through favourites array
+				if (place.id === appViewModelContainer.viewModelFavourites()[m].key) {
+					inFavourites = true;
+					break;
+				}
+			}
+			if (inFavourites === true) {
+				self.iconURL = self.iconURL.imgFav;
+			}
+			else {
+				self.iconURL = self.iconURL.imgBlack;
+			}
+
 
 			// get location from Yelp object
 			self.placeLoc = new google.maps.LatLng(place.location.coordinate.latitude, place.location.coordinate.longitude); 
@@ -404,7 +443,7 @@ function mapApp() {
 
 			// populate array of current markers
 			self.forModel = {};
-			self.forModel[place.name] = self.marker; // key: name, value: marker content
+			self.forModel[place.id] = self.marker; // key: ID, value: marker content
 			model.markers.push(self.forModel);
 
 			self.openInfoWindow = function(content, place, context) {
