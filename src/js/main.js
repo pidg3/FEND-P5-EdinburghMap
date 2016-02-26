@@ -242,13 +242,35 @@ function mapApp() {
 			}
 			else {
 				self.toggleFilterSwitcher(false);
+				self.currentFilter(null);
 			}
 		};
 
 		self.currentFilter = ko.observable(); // value typed into filter box
 
 		self.filteredFavourites = ko.computed(function() {
-			// TBC
+			if(!self.currentFilter()) {  // no filter entered - main favourites array returned
+				console.log('No filter');
+				return self.viewModelFavourites(); 
+			}
+			else { // filter entered: 
+				console.log('Filter');
+				return ko.utils.arrayFilter(self.viewModelFavourites(), function(favourite) {
+
+					var re = new RegExp(self.currentFilter() , 'i'); // define new regex for filter input
+
+					if (re.test(favourite.name)) {  // name regex match
+						return true;
+					}
+					else if (re.test(favourite.type)) { // type regex match
+						return true;
+					}
+					else { // no match
+						return false;
+					}
+				});
+
+			}
 		});
 
 		// ======== Error handling ========

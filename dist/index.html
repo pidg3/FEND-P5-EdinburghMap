@@ -43,10 +43,10 @@
 			<i class="fa fa-filter" data-bind="click: toggleFilter"></i>
 			<hr>
 			<div data-bind="css: { 'hidden': toggleFilterSwitcher() === false }">
-			    <input type="search" id="search" data-bind="value: currentFilter">
+			    <input type="search" id="search" autocomplete="off" data-bind="value: currentFilter, valueUpdate: 'afterkeydown'">
 				<hr>
 		    </div>
-			<div data-bind="foreach: viewModelFavourites">
+			<div data-bind="foreach: filteredFavourites" >
 				<div class="place-container">
 					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div><i data-bind="click: function(data, event) { $root.menuFavourite($data) }" class="fa fa-times"></i>
 				</div>

@@ -1,3 +1,5 @@
+/* exported require */
+
 var gulp = require('gulp'),
 	autoprefixer = require('gulp-autoprefixer'),
 	cssnano = require('gulp-cssnano'),
