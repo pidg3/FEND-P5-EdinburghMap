@@ -613,62 +613,7 @@ function mapApp() {
 		transitionEnd: 'transitionend webkitTransitionEnd otransitionend MSTransitionEnd',
 		animationEnd: 'animationend webkitAnimationEnd oanimationend msAnimationEnd ',
 
-		// listens to clicks in main interface hamburger button, then toggles whether menu open
-		menuListener: function() {
 
-			$('#toggle-menu').on('click', function() {
-
-				var menu = $('#menu');
-
-				// menu.addClass('animating'); ***
-				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
-					interfaceView.closeMenu(menu);
-				} 
-				else {
-					interfaceView.openMenu(menu);
-				}
-			});
-		},
-
-		favouritesListener: function() {
-			$('#toggle-favourites').on('click', function() {
-
-				var favourites = $('#favourites');
-
-				// menu.addClass('animating'); ***
-				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
-					interfaceView.closeMenu(favourites);
-				} 
-				else {
-					interfaceView.openMenu(favourites);
-				}
-
-			});
-		},
-
-		// listens for searches
-		// if menu not open - open it
-		// if menu open - pulse animation
-		searchListener: function() {
-			$('#search-box').on('submit', function() {
-
-				var menu = $('#menu');
-
-				if (menu.hasClass('menu-visible')) { // show pulse animation if menu already open: draws attention to change
-					menu.addClass('animated pulse');
-					menu.on(interfaceView.animationEnd, function() {
-						menu
-						.removeClass('animated pulse');
-						menu.off(interfaceView.animationEnd); // removes event handler
-					});
-
-				}
-				else {
-					interfaceView.openMenu(menu);
-				}
-			});
-		},
-		
 		openMenu: function(DOM) { // need to pass in DOM object
 			DOM.addClass('animating');
 			DOM.addClass('top');
@@ -690,6 +635,78 @@ function mapApp() {
 				DOM.off(interfaceView.transitionEnd); // removes event handler
 			});
 
+		},
+
+		// listens to clicks in main interface hamburger button, then toggles whether menu open
+		menuListener: function() {
+
+			$('#toggle-menu').on('click', function() {
+
+				// open or close main menu
+				var menu = $('#menu');
+				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
+					interfaceView.closeMenu(menu);
+				} 
+				else {
+					interfaceView.openMenu(menu);
+				}
+
+				// close favourites if already open
+				var favourites = $('#favourites');
+				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
+					interfaceView.closeMenu(favourites);
+				} 
+
+			});
+		},
+
+		favouritesListener: function() {
+			$('#toggle-favourites').on('click', function() {
+
+				// open or close favourites
+				var favourites = $('#favourites');
+				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
+					interfaceView.closeMenu(favourites);
+				} 
+				else {
+					interfaceView.openMenu(favourites);
+				}
+
+				// close main menu if already open
+				var menu = $('#menu');
+				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
+					interfaceView.closeMenu(menu);
+				} 
+
+			});
+		},
+
+		// listens for searches
+		// if menu not open - open it
+		// if menu open - pulse animation
+		searchListener: function() {
+			$('#search-box').on('submit', function() {
+
+				// open or refresh main menu
+				var menu = $('#menu');
+				if (menu.hasClass('menu-visible')) { // show pulse animation if menu already open: draws attention to change
+					menu.addClass('animated pulse');
+					menu.on(interfaceView.animationEnd, function() {
+						menu
+						.removeClass('animated pulse');
+						menu.off(interfaceView.animationEnd); // removes event handler
+					});
+				}
+				else {
+					interfaceView.openMenu(menu);
+				}
+
+				// close favourites if already open
+				var favourites = $('#favourites');
+				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
+					interfaceView.closeMenu(favourites);
+				} 
+			});
 		}
 	};
 
