@@ -1,10 +1,8 @@
-
 /*eslint-disable no-console */
 /* exported mapApp mapError */ // called by maps API callback in index.html
 
 // container for whole app - single global variable
 // called by Google Maps script in index.html
-
 function mapInit() {
 	var url = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCKaSn7cGU9ER9KVO63fCTQFOPUnOg1q9U&callback=mapApp&libraries=places';
 	$.getScript(url)
@@ -613,7 +611,6 @@ function mapApp() {
 		transitionEnd: 'transitionend webkitTransitionEnd otransitionend MSTransitionEnd',
 		animationEnd: 'animationend webkitAnimationEnd oanimationend msAnimationEnd ',
 
-
 		openMenu: function(DOM) { // need to pass in DOM object
 			DOM.addClass('animating');
 			DOM.addClass('top');
@@ -634,7 +631,6 @@ function mapApp() {
 				.removeClass('menu-visible');
 				DOM.off(interfaceView.transitionEnd); // removes event handler
 			});
-
 		},
 
 		// listens to clicks in main interface hamburger button, then toggles whether menu open
@@ -656,7 +652,6 @@ function mapApp() {
 				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
 					interfaceView.closeMenu(favourites);
 				} 
-
 			});
 		},
 
@@ -677,7 +672,6 @@ function mapApp() {
 				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
 					interfaceView.closeMenu(menu);
 				} 
-
 			});
 		},
 
