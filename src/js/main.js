@@ -1,6 +1,3 @@
-// Maps API key: AIzaSyCKaSn7cGU9ER9KVO63fCTQFOPUnOg1q9U
-
-// TODO - resolve bug with infoWindow links
 
 /*eslint-disable no-console */
 /* exported mapApp mapError */ // called by maps API callback in index.html
@@ -141,6 +138,8 @@ function mapApp() {
 				mapView.animateMarker(currentMarker);
 			}
 
+			console.log(model.markers);
+
 		};
 
 		// favourite places implementation TODO - figure out how this works...
@@ -206,8 +205,6 @@ function mapApp() {
 				}
 			}
 
-			console.log(markerIndex);
-
 			// if it is: remove object and set image to black
 			if (favIndex !== null) { // if value set i.e. already in favourites
 				self.viewModelFavourites().splice(favIndex, 1); // delete object
@@ -240,7 +237,6 @@ function mapApp() {
 
 			self.viewModelFavourites.valueHasMutated(); // force update of CSS for stars to change colour
 
-			console.log(model.markers);
 		};
 
 		// takes ID - returns true if included in favourites
@@ -273,11 +269,9 @@ function mapApp() {
 
 		self.filteredFavourites = ko.computed(function() {
 			if(!self.currentFilter()) {  // no filter entered - main favourites array returned
-				console.log('No filter');
 				return self.viewModelFavourites(); 
 			}
 			else { // filter entered: 
-				console.log('Filter');
 				return ko.utils.arrayFilter(self.viewModelFavourites(), function(favourite) {
 
 					var re = new RegExp(self.currentFilter() , 'i'); // define new regex for filter input
@@ -295,6 +289,15 @@ function mapApp() {
 
 			}
 		});
+
+		self.anyMarkers = ko.computed(function() {
+			if (model.markers === []) {
+				return false;
+			}
+			else {
+				return false;
+			}
+		}, self);
 
 		// ======== Error handling ========
 
@@ -435,8 +438,6 @@ function mapApp() {
 			// listen for clicks: bring content as Google Maps infoWindow
 			google.maps.event.addListener(self.marker, 'click', function() {
 				var currentMarker = this;
-				console.log('click callback');
-				console.log(self.type);
 				mapView.animateMarker(currentMarker); // marker bounces once on click
 				self.openInfoWindow(self.infoWindowTemplate, place, currentMarker);
 			});
@@ -505,7 +506,7 @@ function mapApp() {
 					}
 				}
 			}
-			// TODO - reset marker array to null??? 
+			
 		}
 
 	};
@@ -619,21 +620,13 @@ function mapApp() {
 
 				var menu = $('#menu');
 
-				menu.addClass('animating');
+				// menu.addClass('animating'); ***
 				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
-					menu.addClass('bottom');
+					interfaceView.closeMenu(menu);
 				} 
 				else {
-					menu.addClass('top');
+					interfaceView.openMenu(menu);
 				}
-
-				// callback when transition ends
-				menu.on(interfaceView.transitionEnd, function() {
-					menu
-					.removeClass('animating top bottom')
-					.toggleClass('menu-visible');
-					menu.off(interfaceView.transitionEnd); // removes event handler
-				});
 			});
 		},
 
@@ -642,21 +635,14 @@ function mapApp() {
 
 				var favourites = $('#favourites');
 
-				favourites.addClass('animating');
+				// menu.addClass('animating'); ***
 				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
-					favourites.addClass('bottom');
+					interfaceView.closeMenu(favourites);
 				} 
 				else {
-					favourites.addClass('top');
+					interfaceView.openMenu(favourites);
 				}
 
-				// callback when transition ends
-				favourites.on(interfaceView.transitionEnd, function() {
-					favourites
-					.removeClass('animating top bottom')
-					.toggleClass('menu-visible');
-					favourites.off(interfaceView.transitionEnd); // removes event handler
-				});
 			});
 		},
 
@@ -668,8 +654,8 @@ function mapApp() {
 
 				var menu = $('#menu');
 
-				if (menu.hasClass('menu-visible')) {
-					menu.addClass('animated pulse'); // trigger animation
+				if (menu.hasClass('menu-visible')) { // show pulse animation if menu already open: draws attention to change
+					menu.addClass('animated pulse');
 					menu.on(interfaceView.animationEnd, function() {
 						menu
 						.removeClass('animated pulse');
@@ -678,16 +664,32 @@ function mapApp() {
 
 				}
 				else {
-					menu.addClass('animating');
-					menu.addClass('top');
-					menu.on(interfaceView.transitionEnd, function() {
-						menu
-						.removeClass('animating top bottom')
-						.toggleClass('menu-visible');
-						menu.off(interfaceView.transitionEnd);
-					});
+					interfaceView.openMenu(menu);
 				}
 			});
+		},
+		
+		openMenu: function(DOM) { // need to pass in DOM object
+			DOM.addClass('animating');
+			DOM.addClass('top');
+			DOM.on(interfaceView.transitionEnd, function() {
+				DOM
+				.removeClass('animating top')
+				.addClass('menu-visible');
+				DOM.off(interfaceView.transitionEnd); // removes event handler
+			});
+		},
+
+		closeMenu: function(DOM) { // need to pass in DOM object
+			DOM.addClass('animating');
+			DOM.addClass('bottom');
+			DOM.on(interfaceView.transitionEnd, function() {
+				DOM
+				.removeClass('animating bottom')
+				.removeClass('menu-visible');
+				DOM.off(interfaceView.transitionEnd); // removes event handler
+			});
+
 		}
 	};
 
