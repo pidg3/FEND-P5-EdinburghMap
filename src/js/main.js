@@ -124,13 +124,19 @@ function mapApp() {
 			if (alreadyMarker === false) {
 				yelpView.searchID(ID, function(result) { // create new marker via Yelp callback
 					mapView.createMarker(result); 
-					console.log(self.anyMarkers());
-					console.log(self.viewModelMarkers().length);
 				});
 			}
+			else if (alreadyMarker === true) { // do not create marker emphasise existing marker
+				mapView.animateMarker(currentMarker); // animate marker
+				mapClosure.panTo(currentMarker.position); // center map to marker position
 
-			else if (alreadyMarker === true) {
-				mapView.animateMarker(currentMarker);
+				// if mobile device: close menu
+				if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
+					
+					interfaceView.closeMenu($('#menu')); 
+					interfaceView.closeMenu($('#favourites'));
+				}
+
 			}
 		};
 
@@ -405,6 +411,17 @@ function mapApp() {
 
 			// get location from Yelp object
 			self.placeLoc = new google.maps.LatLng(place.location.coordinate.latitude, place.location.coordinate.longitude); 
+
+			// for mobile devices/small screens TODO-DEBUG set to 600
+			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
+				
+				// close menu (avoid obscuring markers)
+				interfaceView.closeMenu($('#menu')); 
+				interfaceView.closeMenu($('#favourites'));
+
+				// set map to marker location
+				mapClosure.panTo(self.placeLoc);
+			}
 
 			// create actual marker
 			self.marker = new google.maps.Marker({
