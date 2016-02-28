@@ -111,7 +111,7 @@ hr {
 #search { 
 	border-radius: 10px;
 	height: 30px;
-	width: 200px;
+	width: 220px;
 	outline: none;
 	padding: 0px 28px 0px 10px;
 }
@@ -123,17 +123,52 @@ hr {
   color: #4f5b66;
 }
 
-
 .search-container .icon:hover { /* Magnifying glass symbol */
 	cursor: pointer;
 	color: #686868;
-
-
 }
+
+.clear-markers {
+	float: right;
+	font-size: 10px;
+	padding: 8px 0;
+	max-width: 55px;
+	text-align: center;
+}
+.clear-markers:hover {
+	cursor: pointer;
+}
+
+.clear-markers p {
+	border: 1px #4f5b66 solid;
+	border-radius: 10px;
+	padding: 3px;
+	box-shadow: 2px 2px 3px #888888;
+	background-color: white;
+}
+.clear-markers p:hover {
+	background-color: #E8E8E8;
+}
+
 
 /* Remove delete button from search box
 Credit: http://geektnt.com/how-to-remove-x-from-search-input-field-on-chrome-and-ie.html
 */
+
+/* Small screens */
+
+@media (max-width: 600px) {
+	#search {
+		width: 180px;
+	}
+
+	.clear-markers {
+		position: absolute;
+		top: 46px;
+		right: 5px;
+	}
+
+}
 
 input[type=text]::-ms-clear {  display: none; width : 0; height: 0; } /* Remove delete button from search box */
 input[type=text]::-ms-reveal {  display: none; width : 0; height: 0; }
@@ -291,11 +326,44 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .place-container > .fa-star {
 	font-size: 19px;
 	float: right;
-	padding: 10px 0 10px 0;
+	padding: 10px 0 0 0;
 }
 .place-container > .fa-star:hover {
 	cursor: pointer;
 	color: #686868;
+}
+
+@media (max-width: 600px) {
+	.menu-heading {
+		font-size: 15px;
+		font-weight: 700;
+		margin: 10px 0;
+		float: left;
+	}
+
+	.menu-visible > .fa-filter { /* Filter icon - favourites only */
+		font-size: 20px;
+		padding: 10px 0;
+	}
+
+	#menu {
+		min-height: 300px;
+		max-height: 360px;
+		width: 160px;
+	}
+
+	#favourites {
+		min-height: 300px;
+		max-height: 360px;
+		left: 40px;
+		width: 160px;
+	}
+
+	.place-container > .place-name {
+		max-width: 130px;
+		font-size: 13px;
+	}
+
 }
 
 /* ======== Crosses in favourites ======== */
@@ -303,7 +371,7 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .place-container > .fa-times {
 	font-size: 19px;
 	float: right;
-	padding: 10px 0 10px 0;
+	padding: 8px 0 0 0;
 }
 .place-container > .fa-times:hover {
 	cursor: pointer;

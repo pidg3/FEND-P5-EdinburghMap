@@ -60,14 +60,17 @@
 	<div class="top-bar">
 		<i id="toggle-menu" class="fa fa-bars fa-3x"></i>
 		<i id="toggle-favourites" class="fa fa-star fa-3x"></i>
-		<i id="clear-markers" class="fa fa-times fa-3x" data-bind="click: clearMarkers"></i> <!-- TODO - remote temp icon, for debug only -->
-
+		
 		<div class="search-container">
 		    <form data-bind="submit: searchBox" id="search-box">
 			    <input type="search" id="search" data-bind="value: searchQuery">
 			    <span data-bind="click: searchBox" class="icon"><i class="fa fa-search"></i></span>
 				<submit>
 		    </form>
+		</div>
+
+		<div class="clear-markers" data-bind="click: clearMarkers">
+			<p>Clear Markers</p>
 		</div>
 
 	</div>

@@ -61,12 +61,7 @@ function mapApp() {
 			name: 'Other',
 			imgBlack: '../images/other.png',
 			imgFav: '../images/other-fav.png'
-		}, 
-
-		favouriteList: [],
-
-		markers: [] // holds current markers. Needs to be array as index is used for selection in Yelp API calls
-
+		}
 	};	
 
 	// delared as function as per KnockoutJS documentation
@@ -118,10 +113,10 @@ function mapApp() {
 			var alreadyMarker = false;
 			var currentMarker;
 
-			for (var i = 0; i < model.markers.length; i++) { // loop through existing markers
-				if (model.markers[i][Object.keys(model.markers[i])[0]].id === ID) { // marker already on map
+			for (var i = 0; i < self.viewModelMarkers().length; i++) { // loop through existing markers
+				if (self.viewModelMarkers()[i][Object.keys(self.viewModelMarkers()[i])[0]].id === ID) { // marker already on map
 					alreadyMarker = true;
-					currentMarker = model.markers[i][Object.keys(model.markers[i])[0]]; // marker object
+					currentMarker = self.viewModelMarkers()[i][Object.keys(self.viewModelMarkers()[i])[0]]; // marker object
 					break;
 				}
 			}
@@ -129,19 +124,21 @@ function mapApp() {
 			if (alreadyMarker === false) {
 				yelpView.searchID(ID, function(result) { // create new marker via Yelp callback
 					mapView.createMarker(result); 
+					console.log(self.anyMarkers());
+					console.log(self.viewModelMarkers().length);
 				});
 			}
 
 			else if (alreadyMarker === true) {
 				mapView.animateMarker(currentMarker);
 			}
-
-			console.log(model.markers);
-
 		};
 
-		// favourite places implementation TODO - figure out how this works...
-		self.viewModelFavourites = ko.observableArray(); // set observable to point to model data+
+		// favourite places implementation
+		self.viewModelFavourites = ko.observableArray();
+
+		// container for marker objects
+		self.viewModelMarkers = ko.observableArray();
 
 		// infoWindow data for bindings
 		self.infoWindowContent = {
@@ -196,8 +193,8 @@ function mapApp() {
 
 			// work out if key already in marker array
 			var markerIndex = null;
-			for (var j = 0; j < model.markers.length; j++) { // loop through marker array
-				if (model.markers[j][ID] !== null && model.markers[j][ID] !== undefined) { // if a marker exists with this ID
+			for (var j = 0; j < self.viewModelMarkers().length; j++) { // loop through marker array
+				if (self.viewModelMarkers()[j][ID] !== null && self.viewModelMarkers()[j][ID] !== undefined) { // if a marker exists with this ID
 					markerIndex = j;
 					break;
 				}
@@ -208,10 +205,10 @@ function mapApp() {
 				self.viewModelFavourites().splice(favIndex, 1); // delete object
 				if (markerIndex !== null) {
 					if (type !== 'Other') {
-						model.markers[markerIndex][ID].setIcon(model.iconLibrary[type].imgBlack); // set to correct icon based on type
+						self.viewModelMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgBlack); // set to correct icon based on type
 					}
 					else {
-						model.markers[markerIndex][ID].setIcon(model.Other.imgBlack);
+						self.viewModelMarkers()[markerIndex][ID].setIcon(model.Other.imgBlack);
 					}				}
 			}
 
@@ -225,10 +222,10 @@ function mapApp() {
 				self.viewModelFavourites().push(newFavourite); // push to model data
 				if (markerIndex !== null) {
 					if (type !== 'Other') {
-						model.markers[markerIndex][ID].setIcon(model.iconLibrary[type].imgFav); // set to correct icon based on type
+						self.viewModelMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgFav); // set to correct icon based on type
 					}
 					else {
-						model.markers[markerIndex][ID].setIcon(model.Other.imgFav);
+						self.viewModelMarkers()[markerIndex][ID].setIcon(model.Other.imgFav);
 					}
 				}
 			}
@@ -287,15 +284,6 @@ function mapApp() {
 
 			}
 		});
-
-		self.anyMarkers = ko.computed(function() {
-			if (model.markers === []) {
-				return false;
-			}
-			else {
-				return false;
-			}
-		}, self);
 
 		// ======== Error handling ========
 
@@ -362,11 +350,11 @@ function mapApp() {
 			console.log(place); // TODO - remove (useful for debugging in dev)
 
 			// remove any pre-existing animation: takes out bug where markers can get stuck in infinite loop
-			for (var k = 0; k < model.markers.length; k++) {
+			for (var k = 0; k < appViewModelContainer.viewModelMarkers().length; k++) {
 
 				// there will only ever be one pair of object values, however this allows key and value to be separated
-				for (var refMarker in model.markers[k]) {
-					model.markers[k][refMarker].setAnimation(null); // reset animation
+				for (var refMarker in appViewModelContainer.viewModelMarkers()[k]) {
+					appViewModelContainer.viewModelMarkers()[k][refMarker].setAnimation(null); // reset animation
 				}
 			}
 				
@@ -443,7 +431,7 @@ function mapApp() {
 			// populate array of current markers
 			self.forModel = {};
 			self.forModel[place.id] = self.marker; // key: ID, value: marker content
-			model.markers.push(self.forModel);
+			appViewModelContainer.viewModelMarkers().push(self.forModel);
 
 			self.openInfoWindow = function(content, place, context) {
 
@@ -483,13 +471,13 @@ function mapApp() {
 
 			// loop through markers in model data
 			// iterate backwards as allows splice() to be used to remove items without corrupting index
-			for (var i = model.markers.length; i >= 0; i--) { 
+			for (var i = appViewModelContainer.viewModelMarkers().length; i >= 0; i--) { 
 
 				inFavourites = false; // reset
 
 				// there will only ever be one pair of object values, however this allows key and value to be separated
-				for (var refMarker in model.markers[i]) {
-					currentMarker = model.markers[i][refMarker]; // marker object
+				for (var refMarker in appViewModelContainer.viewModelMarkers()[i]) {
+					currentMarker = appViewModelContainer.viewModelMarkers()[i][refMarker]; // marker object
 
 					for (var refFav in appViewModelContainer.viewModelFavourites()) { // loop through favourites
 						if (appViewModelContainer.viewModelFavourites()[refFav].key === currentMarker.id) {
@@ -500,13 +488,11 @@ function mapApp() {
 
 					if (inFavourites === false) {
 						currentMarker.setMap(null); // set so do not display on map
-						model.markers.splice(i, 1); // remove from marker array
+						appViewModelContainer.viewModelMarkers().splice(i, 1); // remove from marker array
 					}
 				}
-			}
-			
+			}			
 		}
-
 	};
 
 	// all Yelp API calls
@@ -576,7 +562,7 @@ function mapApp() {
 
 			var typeParameters = {
 				term : query, // search for query passed to searchAll
-				limit: 10,
+				limit: 6,
 				oauth_timestamp: Math.floor(Date.now()/1000) // generated with each request to avoid timeout issues (300 second limit)
 			};
 
