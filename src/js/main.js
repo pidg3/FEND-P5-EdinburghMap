@@ -28,32 +28,32 @@ function mapApp() {
 				name: 'Bars',
 				imgBlack: '../images/bar.png',
 				imgFav: '../images/bar-fav.png',
-				yelpRefs: ['pubs', 'bars', 'cocktailbars']
+				yelpRefs: ['Bars', 'pubs', 'bars', 'cocktailbars']
 			},
 			Cafes: {
 				name: 'Cafes',
 				imgBlack: '../images/cafe.png',
 				imgFav: '../images/cafe-fav.png',
-				yelpRefs: ['cafes', 'coffee', 'tea']
+				yelpRefs: ['Cafes', 'cafes', 'coffee', 'tea']
 			},
 			Attractions: {
 				name: 'Attractions',
 				imgBlack: '../images/attraction.png',
 				imgFav: '../images/attraction-fav.png',
-				yelpRefs: ['galleries', 'museums', 'landmarks']
+				yelpRefs: ['Attractions', 'galleries', 'museums', 'landmarks']
 			},
 			Restaurants: {
 				name: 'Restaurants',
 				imgBlack: '../images/restaurant.png',
 				imgFav: '../images/restaurant-fav.png',
-				yelpRefs: ['indian', 'indpak', 'mexican','french', 'gastropub', 'english', 'scottish', 'tuskish', 'italian','steak', 'burgers', 'seafood',
+				yelpRefs: ['Restaurants', 'indian', 'indpak', 'mexican','french', 'gastropub', 'english', 'scottish', 'tuskish', 'italian','steak', 'burgers', 'seafood',
 				'british', 'modern_european', 'sandwiches','vegetarian', 'japanese', 'chinese']
 			},
 			Sports: {
 				name: 'Sports',
 				imgBlack: '../images/sports.png',
 				imgFav: '../images/sports-fav.png',
-				yelpRefs: ['football', 'stadiumsarenas']
+				yelpRefs: ['Sports', 'football', 'stadiumsarenas']
 			}
 		},
 
@@ -161,6 +161,8 @@ function mapApp() {
 		// needed as menu returns this as an object rather than three separate values
 		// also need to get 'type' into one of required categories (so toggleFavourite can update marker image)
 		self.menuFavourite = function(favourite) {
+
+			console.log(favourite);
 
 			var mainType = ''; // used for type category as listed in model
 
@@ -408,19 +410,20 @@ function mapApp() {
 				self.iconURL = self.iconURL.imgBlack;
 			}
 
-
 			// get location from Yelp object
 			self.placeLoc = new google.maps.LatLng(place.location.coordinate.latitude, place.location.coordinate.longitude); 
 
-			// for mobile devices/small screens TODO-DEBUG set to 600
+			// set map to marker location
+			mapClosure.panTo(self.placeLoc);
+
+			// for mobile devices/small screens
 			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
 				
 				// close menu (avoid obscuring markers)
 				interfaceView.closeMenu($('#menu')); 
 				interfaceView.closeMenu($('#favourites'));
 
-				// set map to marker location
-				mapClosure.panTo(self.placeLoc);
+				
 			}
 
 			// create actual marker

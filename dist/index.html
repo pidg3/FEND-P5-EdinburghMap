@@ -28,7 +28,8 @@
 			<hr>
 			<div data-bind="foreach: displayList" id="search-display">
 				<div class="place-container">
-					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div><i data-bind="click: function(data, event) { $root.menuFavourite($data) }, css: { 'star-yellow': $root.favouriteChecker($data.key) === true }" class="fa fa-star star-menu"></i> <!-- Pass index -->
+					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div>
+					<i data-bind="click: function(data, event) { $root.menuFavourite($data) }, css: { 'star-yellow': $root.favouriteChecker($data.key) === true }" class="fa fa-star star-menu"></i> <!-- Pass index -->
 				</div>
 			</div>
 			<div id="search-loading" class="hidden">
@@ -48,7 +49,8 @@
 		    </div>
 			<div data-bind="foreach: filteredFavourites" >
 				<div class="place-container">
-					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div><i data-bind="click: function(data, event) { $root.menuFavourite($data) }" class="fa fa-times"></i>
+					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div>
+					<i data-bind="click: function(data, event) { $root.menuFavourite($data) }" class="fa fa-times"></i>
 				</div>
 			</div>
 

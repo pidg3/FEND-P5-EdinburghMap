@@ -209,21 +209,21 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .info-content .info-photo {
 	float: left;
 	width: 100px; /* All image sizes pre-set to avoid ugly rendering */
-	height: 100px;
+	height: auto;
 }
 
 .info-content .info-rating {
 	max-width: 120px;
 	padding: 8px 0 5px 10px;
 	width: 120px;
-	height: 22px;
+	height: auto;
 }
 
 .info-content .info-yelp {
 	max-width: 120px;
 	padding: 8px 0 0 10px;
 	width: 120px;
-	height: 28px;
+	height: auto;
 }
 
 
@@ -237,6 +237,35 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .info-content > .fa-star:hover {
 	cursor: pointer;
 	color: #686868;	
+}
+
+@media (max-width: 600px) {
+	.info-content h4 {
+		font-size: 16px;
+	}
+
+	.info-content p {
+		font-size: 11px;
+	}
+
+	.info-content a {
+		font-size: 12px;
+	}
+
+	.info-content .fa-star {
+		font-size: 22px;
+		margin: 0;
+	}
+
+	.info-content .info-rating {
+		width: 90px;
+	}
+
+	.info-content .info-yelp {
+		width: 90px;
+	}
+	
+	
 }
 
 /* ======== Star colour changer - both infoWindow and menu ======== */
