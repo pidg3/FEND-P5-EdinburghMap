@@ -1,11 +1,17 @@
 # FEND P5: Edinburgh Map
 
-This project is for the Udacity Front End Nanodegree. 
+This project is for the Udacity Front End Nanodegree. GitHub hosted version here: http://pidg3.github.io/FEND-P5-EdinburghMap
 
 The idea is:
 
 1. To allow the user to get a sense of cool places and cool things going on in Edinburgh.
 2. To allow the user to save a list of 'favourite places' that will persist over time.
+
+Current status (as at 4 March 16):
+
+* About 70% of the way there.
+* I've stopped now as I've pretty much reached the limit of what I can do on the client side. I want to make sure OAuth calls are properly secured, for example. And I'd like to have data persist properly.
+* Next step is to get this properly hosted, then finish off the 'exceeded' rubric for the project.
 
 ## MV* strategy
 
