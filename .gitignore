@@ -2,3 +2,5 @@
 .eslintignore
 node_modules
 notes.txt
+apache-transfer.sh
+php/keys.php

@@ -26,41 +26,41 @@ function mapApp() {
 		iconLibrary: {
 			Bars: {
 				name: 'Bars',
-				imgBlack: '../images/bar.png',
-				imgFav: '../images/bar-fav.png',
+				imgBlack: '/images/bar.png',
+				imgFav: '/images/bar-fav.png',
 				yelpRefs: ['Bars', 'pubs', 'bars', 'cocktailbars']
 			},
 			Cafes: {
 				name: 'Cafes',
-				imgBlack: '../images/cafe.png',
-				imgFav: '../images/cafe-fav.png',
+				imgBlack: '/images/cafe.png',
+				imgFav: '/images/cafe-fav.png',
 				yelpRefs: ['Cafes', 'cafes', 'coffee', 'tea']
 			},
 			Attractions: {
 				name: 'Attractions',
-				imgBlack: '../images/attraction.png',
-				imgFav: '../images/attraction-fav.png',
+				imgBlack: '/images/attraction.png',
+				imgFav: '/images/attraction-fav.png',
 				yelpRefs: ['Attractions', 'galleries', 'museums', 'landmarks']
 			},
 			Restaurants: {
 				name: 'Restaurants',
-				imgBlack: '../images/restaurant.png',
-				imgFav: '../images/restaurant-fav.png',
+				imgBlack: '/images/restaurant.png',
+				imgFav: '/images/restaurant-fav.png',
 				yelpRefs: ['Restaurants', 'indian', 'indpak', 'mexican','french', 'gastropub', 'english', 'scottish', 'tuskish', 'italian','steak', 'burgers', 'seafood',
 				'british', 'modern_european', 'sandwiches','vegetarian', 'japanese', 'chinese']
 			},
 			Sports: {
 				name: 'Sports',
-				imgBlack: '../images/sports.png',
-				imgFav: '../images/sports-fav.png',
+				imgBlack: '/images/sports.png',
+				imgFav: '/images/sports-fav.png',
 				yelpRefs: ['Sports', 'football', 'stadiumsarenas']
 			}
 		},
 
 		Other: { // used if cannot find a match with other icons
 			name: 'Other',
-			imgBlack: '../images/other.png',
-			imgFav: '../images/other-fav.png'
+			imgBlack: '/images/other.png',
+			imgFav: '/images/other-fav.png'
 		}
 	};	
 
@@ -75,7 +75,8 @@ function mapApp() {
 			$('#search-display').addClass('hidden'); // shows loading spinner and hides search results
 			$('#search-loading').removeClass('hidden');
 
-			yelpView.searchAll(query, function(result) { // callback function - executes when Yelp data returned
+			yelpView.search(query, function(result) { // callback function - executes when Yelp data returned
+				console.log(result);
 				self.displayList([]); // reset list before re-populate
 				var tempItem; // holder var for current dataset
 
@@ -122,7 +123,7 @@ function mapApp() {
 			}
 
 			if (alreadyMarker === false) {
-				yelpView.searchID(ID, function(result) { // create new marker via Yelp callback
+				yelpView.get_business(ID, function(result) { // create new marker via Yelp callback
 					mapView.createMarker(result); 
 				});
 			}
@@ -516,58 +517,25 @@ function mapApp() {
 	};
 
 	// all Yelp API calls
-	// as a design principle data is NOT processed/parsed but instead raw JSON return passed to other functions
+	// as a design principle data is NOT processed/parsed here but instead raw JSON return passed to other functions
+	// API calls made via a PHP handler
 
 	var yelpView = {
-
-		// credit for API call: Udacity forums - https://discussions.udacity.com/t/how-to-make-ajax-request-to-yelp-api/13699/18
-
-		// this is not a secure implementation as keys are visible to all
-		// TODO - hide using server side code
-
-		yelpAPI: {
-			YELP_KEY_SECRET: 'sWaoF5jHGhP3lrRobEOhgBpYq80',	
-			YELP_TOKEN_SECRET: '54_OmI6aX963nRd9JJBb1PTLy5A'
-		},
-
-		nonce_generate: function() { // generates random string as per Yelp OAuth spec
-			return (Math.floor(Math.random() * 1e12).toString());
-		},
-
-		commonParameters: {
-			oauth_consumer_key: 'VysIcTbiC1NAl7xLTDqCrA',
-			oauth_token: 'pEE9CKVmrKhZr6yVigDUMej-pEu526M_',
-			oauth_signature_method: 'HMAC-SHA1',
-			oauth_version : '1.0',
-			callback: 'cb',
-			location : 'Edinburgh'
-		},
 
 		// functions need to be called using callback to 'do something' with the result
 		// this avoids issues due to async AJAX request
 
-		searchID: function(ID, callback) { // search by specific ID - must match exactly
-
-			var IDParameters = {
-				oauth_timestamp: Math.floor(Date.now()/1000) // generated with each request to avoid timeout issues (300 second limit)
-			};
-
-			var IDUrl = 'https://api.yelp.com/v2/business/' + ID;
-
-			$.extend(IDParameters, this.commonParameters);
-
-
-			IDParameters.oauth_nonce = this.nonce_generate(); // must be before signature generated otherwise will return 400 error
-
-			var encodedSignature = oauthSignature.generate('GET', IDUrl, IDParameters, this.yelpAPI.YELP_KEY_SECRET, this.yelpAPI.YELP_TOKEN_SECRET);
-			IDParameters.oauth_signature = encodedSignature;
+		get_business: function(ID, callback) { // search by specific ID - must match exactly
 
 			var ajaxParameters = {
-				url: IDUrl,
-				data: IDParameters,
-				cache: true,                // crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
-				dataType: 'jsonp',
-				success: callback			
+				type: 'POST',
+				url:'/php/yelp.php',
+				data: { 
+					type: 'get_business', // 'search' or 'get_business'
+					businessID: ID
+				}, 
+				dataType:'JSON',
+				success: callback		
 			};
 
 			// Send AJAX query via jQuery library.
@@ -578,31 +546,21 @@ function mapApp() {
 		},
 
 
-		searchAll: function(query, callback) { // search for 'anything' - place name, type etc
-
-			var typeParameters = {
-				term : query, // search for query passed to searchAll
-				limit: 6,
-				oauth_timestamp: Math.floor(Date.now()/1000) // generated with each request to avoid timeout issues (300 second limit)
-			};
-
-			$.extend(typeParameters, this.commonParameters);
-
-			typeParameters.oauth_nonce = this.nonce_generate(); // must be before signature generated otherwise will return 400 error
-
-			var encodedSignature = oauthSignature.generate('GET', 'https://api.yelp.com/v2/search', typeParameters, this.yelpAPI.YELP_KEY_SECRET, this.yelpAPI.YELP_TOKEN_SECRET);
-			typeParameters.oauth_signature = encodedSignature;
+		search: function(query, callback) { // search for 'anything' - place name, type etc
 
 			var ajaxParameters = {
-				url: 'https://api.yelp.com/v2/search',
-				data: typeParameters,
-				cache: true,                // crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
-				dataType: 'jsonp',
-				success: callback				
+				type: 'POST',
+				url:'/php/yelp.php',
+				data: { 
+					type: 'search', // 'search' or 'get_business'
+					term: query
+				}, 
+				dataType:'JSON',
+				success: callback
 			};
 
 			// Send AJAX query via jQuery library.
-			$.ajax(ajaxParameters)
+			$.ajax(ajaxParameters) // return to be parsed by other function - API call only here
 			.error(function(){
 				appViewModelContainer.errorHandler('The Yelp API is misbehaving.'); // error handling
 			});
