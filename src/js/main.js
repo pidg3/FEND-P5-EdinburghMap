@@ -218,7 +218,8 @@ function mapApp() {
 					}
 					else {
 						self.viewModelMarkers()[markerIndex][ID].setIcon(model.Other.imgBlack);
-					}				}
+					}
+				}
 			}
 
 			// if it isn't: add new object and set image to white
@@ -240,6 +241,16 @@ function mapApp() {
 			}
 
 			self.viewModelFavourites.valueHasMutated(); // force update of CSS for stars to change colour
+
+			// if available; update localStorage
+			// re-write each time to avoid sync issues
+
+			if (storageAvailable('localStorage')) {
+
+				// localStorage only accepts strings
+				localStorage.setItem('favourites', JSON.stringify(self.viewModelFavourites()));
+				console.log('Local storage updated');
+			}
 
 		};
 
@@ -293,6 +304,44 @@ function mapApp() {
 
 			}
 		});
+
+		// ======== LocalStorage for persistent data ========
+
+		// determine whether localStorate available
+
+		function storageAvailable(type) {
+			try {
+				var storage = window[type],
+					x = '__storage_test__';
+				storage.setItem(x, x);
+				storage.removeItem(x);
+				return true;
+			}
+			catch(e) {
+				return false;
+			}
+		}
+
+		
+		if (storageAvailable('localStorage')) {
+
+			// populate from localStorage, if available and populated
+			if(localStorage.getItem('favourites')) {
+				console.log('Favourites updated from local storage');
+
+				// localStorage as string so needs to be parsed
+				self.viewModelFavourites(JSON.parse(localStorage.getItem('favourites')));
+			}
+		}
+
+		// display log message if functionality not available
+		else {
+			console.log('No local storage available.');
+		}
+
+
+
+		// if available and populated
 
 		// ======== Error handling ========
 
