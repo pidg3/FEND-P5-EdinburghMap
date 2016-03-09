@@ -115,7 +115,7 @@ if ($_POST['type'] === 'get_business') {
 
 else {
 	$term = $_POST['term'];
-	echo search($term, $location);
+	echo search($term);
 }
 
 ?>
