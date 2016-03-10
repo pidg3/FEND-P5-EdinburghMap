@@ -114,17 +114,17 @@ function mapApp() {
 			var alreadyMarker = false;
 			var currentMarker;
 
-			for (var i = 0; i < self.viewModelMarkers().length; i++) { // loop through existing markers
-				if (self.viewModelMarkers()[i][Object.keys(self.viewModelMarkers()[i])[0]].id === ID) { // marker already on map
+			for (var i = 0; i < self.viewModelPlaceMarkers().length; i++) { // loop through existing markers
+				if (self.viewModelPlaceMarkers()[i][Object.keys(self.viewModelPlaceMarkers()[i])[0]].id === ID) { // marker already on map
 					alreadyMarker = true;
-					currentMarker = self.viewModelMarkers()[i][Object.keys(self.viewModelMarkers()[i])[0]]; // marker object
+					currentMarker = self.viewModelPlaceMarkers()[i][Object.keys(self.viewModelPlaceMarkers()[i])[0]]; // marker object
 					break;
 				}
 			}
 
 			if (alreadyMarker === false) {
 				yelpView.get_business(ID, function(result) { // create new marker via Yelp callback
-					mapView.createMarker(result); 
+					mapView.createPlaceMarker(result); 
 				});
 			}
 			else if (alreadyMarker === true) { // do not create marker emphasise existing marker
@@ -145,10 +145,14 @@ function mapApp() {
 		self.viewModelFavourites = ko.observableArray();
 
 		// container for marker objects
-		self.viewModelMarkers = ko.observableArray();
+		self.viewModelPlaceMarkers = ko.observableArray();
+		self.viewModelTwitterMarkers = ko.observableArray();
+
+		// container for place marker objects
+		self.viewModelTwitterMarkers = ko.observableArray();
 
 		// infoWindow data for bindings
-		self.infoWindowContent = {
+		self.infoWindowPlaceContent = {
 			name: '',
 			copy: '',
 			url: '',
@@ -156,6 +160,10 @@ function mapApp() {
 			photo: '',
 			mapLink: '',
 			address: ''
+		};
+
+		self.infoWindowTwitterContent = {
+			copy: ''
 		};
 
 		// parse values and pass to toggleFavourite()
@@ -202,8 +210,8 @@ function mapApp() {
 
 			// work out if key already in marker array
 			var markerIndex = null;
-			for (var j = 0; j < self.viewModelMarkers().length; j++) { // loop through marker array
-				if (self.viewModelMarkers()[j][ID] !== null && self.viewModelMarkers()[j][ID] !== undefined) { // if a marker exists with this ID
+			for (var j = 0; j < self.viewModelPlaceMarkers().length; j++) { // loop through marker array
+				if (self.viewModelPlaceMarkers()[j][ID] !== null && self.viewModelPlaceMarkers()[j][ID] !== undefined) { // if a marker exists with this ID
 					markerIndex = j;
 					break;
 				}
@@ -214,10 +222,10 @@ function mapApp() {
 				self.viewModelFavourites().splice(favIndex, 1); // delete object
 				if (markerIndex !== null) {
 					if (type !== 'Other') {
-						self.viewModelMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgBlack); // set to correct icon based on type
+						self.viewModelPlaceMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgBlack); // set to correct icon based on type
 					}
 					else {
-						self.viewModelMarkers()[markerIndex][ID].setIcon(model.Other.imgBlack);
+						self.viewModelPlaceMarkers()[markerIndex][ID].setIcon(model.Other.imgBlack);
 					}
 				}
 			}
@@ -232,10 +240,10 @@ function mapApp() {
 				self.viewModelFavourites().push(newFavourite); // push to model data
 				if (markerIndex !== null) {
 					if (type !== 'Other') {
-						self.viewModelMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgFav); // set to correct icon based on type
+						self.viewModelPlaceMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgFav); // set to correct icon based on type
 					}
 					else {
-						self.viewModelMarkers()[markerIndex][ID].setIcon(model.Other.imgFav);
+						self.viewModelPlaceMarkers()[markerIndex][ID].setIcon(model.Other.imgFav);
 					}
 				}
 			}
@@ -339,9 +347,16 @@ function mapApp() {
 			console.log('No local storage available.');
 		}
 
+		// ======== Twitter integration ========
+
+		self.toggleTwitter = function() {
+			twitterView.search(11, function(result) { // callback function - executes when Twitter data returned
+				console.log(result);
+				mapView.createTwitterMarkers(result);
+			});
 
 
-		// if available and populated
+		};
 
 		// ======== Error handling ========
 
@@ -401,18 +416,18 @@ function mapApp() {
 
 		// determine which icon to use based on data in model
 		// have to pass in single Yelp place object
-		createMarker: function(place) {
+		createPlaceMarker: function(place) {
 			
 			var self = this;
 
 			console.log(place); // TODO - remove (useful for debugging in dev)
 
 			// remove any pre-existing animation: takes out bug where markers can get stuck in infinite loop
-			for (var k = 0; k < appViewModelContainer.viewModelMarkers().length; k++) {
+			for (var k = 0; k < appViewModelContainer.viewModelPlaceMarkers().length; k++) {
 
 				// there will only ever be one pair of object values, however this allows key and value to be separated
-				for (var refMarker in appViewModelContainer.viewModelMarkers()[k]) {
-					appViewModelContainer.viewModelMarkers()[k][refMarker].setAnimation(null); // reset animation
+				for (var refMarker in appViewModelContainer.viewModelPlaceMarkers()[k]) {
+					appViewModelContainer.viewModelPlaceMarkers()[k][refMarker].setAnimation(null); // reset animation
 				}
 			}
 				
@@ -489,7 +504,7 @@ function mapApp() {
 
 
 			// pre-set content of infoWindow
-			self.infoWindowTemplate = '<div class="info-content" id="info-window" data-bind="template: { name: \'infoWindow-template\', data: infoWindowContent }"></div>';
+			self.infoWindowTemplate = '<div class="info-content" id="info-place" data-bind="template: { name: \'infoWindow-place\', data: infoWindowPlaceContent }"></div>';
 
 			// listen for clicks: bring content as Google Maps infoWindow
 			google.maps.event.addListener(self.marker, 'click', function() {
@@ -501,21 +516,21 @@ function mapApp() {
 			// populate array of current markers
 			self.forModel = {};
 			self.forModel[place.id] = self.marker; // key: ID, value: marker content
-			appViewModelContainer.viewModelMarkers().push(self.forModel);
+			appViewModelContainer.viewModelPlaceMarkers().push(self.forModel);
 
 			self.openInfoWindow = function(content, place, context) {
 
 				// set infoWindow content in viewModel bindings
-				appViewModelContainer.infoWindowContent.name = place.name;
-				appViewModelContainer.infoWindowContent.copy = place.snippet_text;
-				appViewModelContainer.infoWindowContent.url = place.url;
-				appViewModelContainer.infoWindowContent.photo = place.image_url;
-				appViewModelContainer.infoWindowContent.rating = place.rating_img_url_large;
-				appViewModelContainer.infoWindowContent.mapLink = 'http://maps.google.com/?q=' + place.name + ',Edinburgh';
-				appViewModelContainer.infoWindowContent.address = place.location.address;
+				appViewModelContainer.infoWindowPlaceContent.name = place.name;
+				appViewModelContainer.infoWindowPlaceContent.copy = place.snippet_text;
+				appViewModelContainer.infoWindowPlaceContent.url = place.url;
+				appViewModelContainer.infoWindowPlaceContent.photo = place.image_url;
+				appViewModelContainer.infoWindowPlaceContent.rating = place.rating_img_url_large;
+				appViewModelContainer.infoWindowPlaceContent.mapLink = 'http://maps.google.com/?q=' + place.name + ',Edinburgh';
+				appViewModelContainer.infoWindowPlaceContent.address = place.location.address;
 
-				appViewModelContainer.infoWindowContent.ID = place.id; // not used for window but needed for favourite functionality
-				appViewModelContainer.infoWindowContent.type = self.type;
+				appViewModelContainer.infoWindowPlaceContent.ID = place.id; // not used for window but needed for favourite functionality
+				appViewModelContainer.infoWindowPlaceContent.type = self.type;
 
 				// set infoWindow content - includes binding to trigger template
 				mapView.infoWindow.setContent(content);
@@ -524,9 +539,112 @@ function mapApp() {
 				mapView.infoWindow.open(mapClosure, context); // TODO - better loading animation, take out flickers
 
 				// apply bindings
-				ko.applyBindings(appViewModelContainer, document.getElementById('info-window'));
+				ko.applyBindings(appViewModelContainer, document.getElementById('info-place'));
 			};
+
+			// for mobile devices/small screens
+			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
+				
+				// close menu (avoid obscuring markers)
+				interfaceView.closeMenu($('#menu')); 
+				interfaceView.closeMenu($('#favourites'));
+			}
 		},
+
+		createTwitterMarkers: function(tweets) {
+			
+			var self = this;
+
+			self.attachMarker = function(marker, tweet, i) {
+
+				// populate array of markers so can be cleared
+				self.forModel = {};
+				self.forModel['twitter' + i] = marker; // value: marker content
+				appViewModelContainer.viewModelPlaceMarkers().push(self.forModel);
+
+				// preset infoWindow content
+				self.infoWindowTemplate = '<div class="info-content" id="info-twitter" data-bind="template: { name: \'infoWindow-twitter\', data: infoWindowTwitterContent }"></div>';
+
+				google.maps.event.addListener(marker, 'click', function() {
+					var currentMarker = marker;
+					mapView.animateMarker(currentMarker); // marker bounces once on click
+					console.log(tweet.text);
+					appViewModelContainer.infoWindowTwitterContent.copy = tweet.text;
+					appViewModelContainer.infoWindowTwitterContent.screenName = tweet.user.screen_name;
+					appViewModelContainer.infoWindowTwitterContent.imgURL = 'https://twitter.com/' + tweet.user.screen_name + '/profile_image?size=bigger';
+
+					// set infoWindow content - includes binding to trigger template
+					mapView.infoWindow.setContent(self.infoWindowTemplate);
+
+					// show actual infoWindow
+					mapView.infoWindow.open(mapClosure, this); // TODO - better loading animation, take out flickers
+					
+					// apply bindings
+					ko.applyBindings(appViewModelContainer, document.getElementById('info-twitter'));
+
+
+				});
+
+
+			};
+
+			console.log(tweets);
+
+			self.forModel = {}; // for marker array
+			
+			for (var i = 0; i < tweets.statuses.length; i++) {
+
+				// get location from tweet object
+				// if/else needed as sometimes tweets do not have coordinates; is so set to centre of map
+				if (tweets.statuses[i].geo) {
+					self.placeLoc = new google.maps.LatLng(tweets.statuses[i].geo.coordinates[0], tweets.statuses[i].geo.coordinates[1]); 
+				}
+
+				else {
+					self.placeLoc = new google.maps.LatLng(55.944201, -3.197536);
+				}
+
+				// create actual marker
+				self.marker = new google.maps.Marker({
+					map: mapClosure, 
+					position: self.placeLoc,
+					animation: google.maps.Animation.DROP,
+					icon: '/images/tweet.png'
+				});
+
+				// self.forModel[i] = self.marker; // key: array ID, value: marker content
+				// appViewModelContainer.viewModelTwitterMarkers().push(self.forModel); // populate marker object
+
+				self.attachMarker(self.marker, tweets.statuses[i]);
+
+			} // end for loop
+
+			self.openInfoWindow = function(content, tweet, context) {
+
+				console.log(tweet);
+
+				// set infoWindow content in viewModel bindings
+				appViewModelContainer.infoWindowTwitterContent.copy = tweet.text;
+
+				// set infoWindow content - includes binding to trigger template
+				mapView.infoWindow.setContent(content);
+
+				// show actual infoWindow
+				mapView.infoWindow.open(mapClosure, context); // TODO - better loading animation, take out flickers
+
+				// apply bindings
+				ko.applyBindings(appViewModelContainer, document.getElementById('info-place'));
+			};
+
+			// for mobile devices/small screens
+			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
+				
+				// close menu (avoid obscuring markers)
+				interfaceView.closeMenu($('#menu')); 
+				interfaceView.closeMenu($('#favourites'));
+			}
+		},
+
 
 		animateMarker: function(marker) {
 			marker.setAnimation(google.maps.Animation.BOUNCE); // start animation
@@ -541,13 +659,13 @@ function mapApp() {
 
 			// loop through markers in model data
 			// iterate backwards as allows splice() to be used to remove items without corrupting index
-			for (var i = appViewModelContainer.viewModelMarkers().length; i >= 0; i--) { 
+			for (var i = appViewModelContainer.viewModelPlaceMarkers().length; i >= 0; i--) { 
 
 				inFavourites = false; // reset
 
 				// there will only ever be one pair of object values, however this allows key and value to be separated
-				for (var refMarker in appViewModelContainer.viewModelMarkers()[i]) {
-					currentMarker = appViewModelContainer.viewModelMarkers()[i][refMarker]; // marker object
+				for (var refMarker in appViewModelContainer.viewModelPlaceMarkers()[i]) {
+					currentMarker = appViewModelContainer.viewModelPlaceMarkers()[i][refMarker]; // marker object
 
 					for (var refFav in appViewModelContainer.viewModelFavourites()) { // loop through favourites
 						if (appViewModelContainer.viewModelFavourites()[refFav].key === currentMarker.id) {
@@ -558,7 +676,7 @@ function mapApp() {
 
 					if (inFavourites === false) {
 						currentMarker.setMap(null); // set so do not display on map
-						appViewModelContainer.viewModelMarkers().splice(i, 1); // remove from marker array
+						appViewModelContainer.viewModelPlaceMarkers().splice(i, 1); // remove from marker array
 					}
 				}
 			}			
@@ -577,7 +695,7 @@ function mapApp() {
 		get_business: function(ID, callback) { // search by specific ID - must match exactly
 
 			var ajaxParameters = {
-				type: 'POST',
+				type: 'POST', // needs to be POST so can pass data values
 				url:'/php/yelp.php',
 				data: { 
 					type: 'get_business', // 'search' or 'get_business'
@@ -598,7 +716,7 @@ function mapApp() {
 		search: function(query, callback) { // search for 'anything' - place name, type etc
 
 			var ajaxParameters = {
-				type: 'POST',
+				type: 'POST', // needs to be POST so can pass data values
 				url:'/php/yelp.php',
 				data: { 
 					type: 'search', // 'search' or 'get_business'
@@ -612,6 +730,28 @@ function mapApp() {
 			$.ajax(ajaxParameters) // return to be parsed by other function - API call only here
 			.error(function(){
 				appViewModelContainer.errorHandler('The Yelp API is misbehaving.'); // error handling
+			});
+		}
+	};
+
+	// twitter API calls 
+	var twitterView = {
+		search: function(number, callback) { // search by specific ID - must match exactly
+
+			var ajaxParameters = {
+				type: 'POST', // needs to be POST so can pass data values
+				url:'/php/twitter.php',
+				data: { 
+					number: number // number of results to return
+				}, 
+				dataType:'JSON',
+				success: callback		
+			};
+
+			// Send AJAX query via jQuery library.
+			$.ajax(ajaxParameters) // return to be parsed by other function - API call only here
+			.error(function(){
+				appViewModelContainer.errorHandler('The Twitter API has temporarily flown away.'); // error handling
 			});
 		}
 	};

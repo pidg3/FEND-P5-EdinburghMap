@@ -3,4 +3,5 @@
 node_modules
 notes.txt
 apache-transfer.sh
-php/keys.php
+php/yelp-keys.php
+php/twitter-keys.php

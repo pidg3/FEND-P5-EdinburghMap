@@ -17,7 +17,7 @@ $TOKEN = '';
 $TOKEN_SECRET = ''; 
 Separated so can be isolated from GitHub upload for security reasons
 */
-require_once('keys.php');
+require_once('yelp-keys.php');
 
 
 $API_HOST = 'api.yelp.com';

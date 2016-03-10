@@ -93,6 +93,11 @@ hr {
 	padding: 4px 4px 4px 10px;
 }
 
+.top-bar > .fa-twitter { /* Star/favourites icon */
+	font-size: 40px;
+	padding: 4px 4px 4px 10px;
+}
+
 .top-bar > .fa:hover {
 	cursor: pointer;	
 	color: #686868;
@@ -237,6 +242,18 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .info-content > .fa-star:hover {
 	cursor: pointer;
 	color: #686868;	
+}
+
+.info-content> .twitter-name {
+	font-size: 20px;
+}
+
+.info-content> .twitter-image {
+	float: right;
+}
+
+.info-content> .twitter-copy {
+	clear: both;
 }
 
 @media (max-width: 600px) {

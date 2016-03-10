@@ -73,7 +73,8 @@
 	<div class="top-bar">
 		<i id="toggle-menu" class="fa fa-bars fa-3x"></i>
 		<i id="toggle-favourites" class="fa fa-star fa-3x"></i>
-		
+		<i data-bind="click: toggleTwitter" id="toggle-twitter" class="fa fa-twitter fa-3x"></i>
+
 		<div class="search-container">
 		    <form data-bind="submit: searchBox" id="search-box">
 			    <input type="search" id="search" data-bind="value: searchQuery">
@@ -100,9 +101,9 @@
 		<p>Try refreshing the page.</p>
 	</div>
 
-	<!-- ======== Map InfoWindow template ======== -->
+	<!-- ======== Map InfoWindow place template ======== -->
 
-	<script type="text/html" id="infoWindow-template">
+	<script type="text/html" id="infoWindow-place">
 		<h4 data-bind="text: name"></h4> 
 		<i class="fa fa-star star-black" data-bind="click: function(data, event) { $root.toggleFavourite(name, ID, type) }, css: { 'star-yellow': $root.favouriteChecker(ID) === true }"></i><br> <!-- bind() needed to prevent calling click function on load -->
 		<p class="info-copy" data-bind="text: copy"></p> 
@@ -111,6 +112,14 @@
 		<img class="info-rating" data-bind="attr: { src: rating }"></img> 
 		<a data-bind="attr: { href: mapLink }, text: address" target="_blank"></a> 
 		<img class="info-yelp" src="../images/yelp_powered_btn_dark.png" ></img> 
+	</script>
+
+	<!-- ======== Map InfoWindow twitter template ======== -->
+
+	<script type="text/html" id="infoWindow-twitter">
+		<h4 class="twitter-name" data-bind="text: screenName"></h4>
+		<img class="twitter-image" data-bind="attr: { src: imgURL }" alt="Twitter thumbnail"></img> 
+		<p class="twitter-copy" data-bind="text: copy"></p> 
 	</script>
 
 	<!-- build:js js/all-js.min.js -->

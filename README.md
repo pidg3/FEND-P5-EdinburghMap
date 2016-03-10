@@ -4,7 +4,7 @@ This project is for the Udacity Front End Nanodegree. GitHub hosted version here
 
 The idea is:
 
-1. To allow the user to get a sense of cool places and cool things going on in Edinburgh.
+1. To allow the user to get a sense of cool places (Yelp) and cool things (Twitter) going on in Edinburgh.
 2. To allow the user to save a list of 'favourite places' that will persist over time.
 
 Current status (as at 4 March 16):
@@ -27,6 +27,8 @@ KnockoutJS used as framework as per Udacity project rubric. JS currently divided
 
 * Not all restaurants show as icon as Yelp API does not provide an overall category, only sub-category e.g. Indian, French.
 * All sorts of stuff returned in search - add filter for zero reviews?
+* Need to refactor click listeners on menus, favs: chang to KO bindings
+* Need to add PHP info and credits for API calls to this README
 
 ## Notes
 
