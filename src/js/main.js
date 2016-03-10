@@ -114,10 +114,10 @@ function mapApp() {
 			var alreadyMarker = false;
 			var currentMarker;
 
-			for (var i = 0; i < self.viewModelPlaceMarkers().length; i++) { // loop through existing markers
-				if (self.viewModelPlaceMarkers()[i][Object.keys(self.viewModelPlaceMarkers()[i])[0]].id === ID) { // marker already on map
+			for (var i = 0; i < self.viewModelMarkers().length; i++) { // loop through existing markers
+				if (self.viewModelMarkers()[i][Object.keys(self.viewModelMarkers()[i])[0]].id === ID) { // marker already on map
 					alreadyMarker = true;
-					currentMarker = self.viewModelPlaceMarkers()[i][Object.keys(self.viewModelPlaceMarkers()[i])[0]]; // marker object
+					currentMarker = self.viewModelMarkers()[i][Object.keys(self.viewModelMarkers()[i])[0]]; // marker object
 					break;
 				}
 			}
@@ -145,11 +145,7 @@ function mapApp() {
 		self.viewModelFavourites = ko.observableArray();
 
 		// container for marker objects
-		self.viewModelPlaceMarkers = ko.observableArray();
-		self.viewModelTwitterMarkers = ko.observableArray();
-
-		// container for place marker objects
-		self.viewModelTwitterMarkers = ko.observableArray();
+		self.viewModelMarkers = ko.observableArray();
 
 		// infoWindow data for bindings
 		self.infoWindowPlaceContent = {
@@ -159,11 +155,15 @@ function mapApp() {
 			rating: '',
 			photo: '',
 			mapLink: '',
-			address: ''
+			address: '',
+			ID: '',
+			type: ''
 		};
 
 		self.infoWindowTwitterContent = {
-			copy: ''
+			copy: '',
+			screenName: '',
+			imgURL: ''
 		};
 
 		// parse values and pass to toggleFavourite()
@@ -210,8 +210,8 @@ function mapApp() {
 
 			// work out if key already in marker array
 			var markerIndex = null;
-			for (var j = 0; j < self.viewModelPlaceMarkers().length; j++) { // loop through marker array
-				if (self.viewModelPlaceMarkers()[j][ID] !== null && self.viewModelPlaceMarkers()[j][ID] !== undefined) { // if a marker exists with this ID
+			for (var j = 0; j < self.viewModelMarkers().length; j++) { // loop through marker array
+				if (self.viewModelMarkers()[j][ID] !== null && self.viewModelMarkers()[j][ID] !== undefined) { // if a marker exists with this ID
 					markerIndex = j;
 					break;
 				}
@@ -222,10 +222,10 @@ function mapApp() {
 				self.viewModelFavourites().splice(favIndex, 1); // delete object
 				if (markerIndex !== null) {
 					if (type !== 'Other') {
-						self.viewModelPlaceMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgBlack); // set to correct icon based on type
+						self.viewModelMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgBlack); // set to correct icon based on type
 					}
 					else {
-						self.viewModelPlaceMarkers()[markerIndex][ID].setIcon(model.Other.imgBlack);
+						self.viewModelMarkers()[markerIndex][ID].setIcon(model.Other.imgBlack);
 					}
 				}
 			}
@@ -240,10 +240,10 @@ function mapApp() {
 				self.viewModelFavourites().push(newFavourite); // push to model data
 				if (markerIndex !== null) {
 					if (type !== 'Other') {
-						self.viewModelPlaceMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgFav); // set to correct icon based on type
+						self.viewModelMarkers()[markerIndex][ID].setIcon(model.iconLibrary[type].imgFav); // set to correct icon based on type
 					}
 					else {
-						self.viewModelPlaceMarkers()[markerIndex][ID].setIcon(model.Other.imgFav);
+						self.viewModelMarkers()[markerIndex][ID].setIcon(model.Other.imgFav);
 					}
 				}
 			}
@@ -423,11 +423,11 @@ function mapApp() {
 			console.log(place); // TODO - remove (useful for debugging in dev)
 
 			// remove any pre-existing animation: takes out bug where markers can get stuck in infinite loop
-			for (var k = 0; k < appViewModelContainer.viewModelPlaceMarkers().length; k++) {
+			for (var k = 0; k < appViewModelContainer.viewModelMarkers().length; k++) {
 
 				// there will only ever be one pair of object values, however this allows key and value to be separated
-				for (var refMarker in appViewModelContainer.viewModelPlaceMarkers()[k]) {
-					appViewModelContainer.viewModelPlaceMarkers()[k][refMarker].setAnimation(null); // reset animation
+				for (var refMarker in appViewModelContainer.viewModelMarkers()[k]) {
+					appViewModelContainer.viewModelMarkers()[k][refMarker].setAnimation(null); // reset animation
 				}
 			}
 				
@@ -487,8 +487,6 @@ function mapApp() {
 				// close menu (avoid obscuring markers)
 				interfaceView.closeMenu($('#menu')); 
 				interfaceView.closeMenu($('#favourites'));
-
-				
 			}
 
 			// create actual marker
@@ -504,19 +502,19 @@ function mapApp() {
 
 
 			// pre-set content of infoWindow
-			self.infoWindowTemplate = '<div class="info-content" id="info-place" data-bind="template: { name: \'infoWindow-place\', data: infoWindowPlaceContent }"></div>';
+			self.infoWindowTemplatePlace = '<div class="info-content" id="info-place" data-bind="template: { name: \'infoWindow-place\', data: infoWindowPlaceContent }"></div>';
 
 			// listen for clicks: bring content as Google Maps infoWindow
 			google.maps.event.addListener(self.marker, 'click', function() {
 				var currentMarker = this;
 				mapView.animateMarker(currentMarker); // marker bounces once on click
-				self.openInfoWindow(self.infoWindowTemplate, place, currentMarker);
+				self.openInfoWindow(self.infoWindowTemplatePlace, place, currentMarker);
 			});
 
 			// populate array of current markers
 			self.forModel = {};
 			self.forModel[place.id] = self.marker; // key: ID, value: marker content
-			appViewModelContainer.viewModelPlaceMarkers().push(self.forModel);
+			appViewModelContainer.viewModelMarkers().push(self.forModel);
 
 			self.openInfoWindow = function(content, place, context) {
 
@@ -533,6 +531,7 @@ function mapApp() {
 				appViewModelContainer.infoWindowPlaceContent.type = self.type;
 
 				// set infoWindow content - includes binding to trigger template
+				console.log(content);
 				mapView.infoWindow.setContent(content);
 
 				// show actual infoWindow
@@ -560,21 +559,20 @@ function mapApp() {
 				// populate array of markers so can be cleared
 				self.forModel = {};
 				self.forModel['twitter' + i] = marker; // value: marker content
-				appViewModelContainer.viewModelPlaceMarkers().push(self.forModel);
+				appViewModelContainer.viewModelMarkers().push(self.forModel);
 
 				// preset infoWindow content
-				self.infoWindowTemplate = '<div class="info-content" id="info-twitter" data-bind="template: { name: \'infoWindow-twitter\', data: infoWindowTwitterContent }"></div>';
+				self.infoWindowTemplateTwitter = '<div class="info-content" id="info-twitter" data-bind="template: { name: \'infoWindow-twitter\', data: infoWindowTwitterContent }"></div>';
 
 				google.maps.event.addListener(marker, 'click', function() {
 					var currentMarker = marker;
 					mapView.animateMarker(currentMarker); // marker bounces once on click
-					console.log(tweet.text);
 					appViewModelContainer.infoWindowTwitterContent.copy = tweet.text;
 					appViewModelContainer.infoWindowTwitterContent.screenName = tweet.user.screen_name;
 					appViewModelContainer.infoWindowTwitterContent.imgURL = 'https://twitter.com/' + tweet.user.screen_name + '/profile_image?size=bigger';
 
 					// set infoWindow content - includes binding to trigger template
-					mapView.infoWindow.setContent(self.infoWindowTemplate);
+					mapView.infoWindow.setContent(self.infoWindowTemplateTwitter);
 
 					// show actual infoWindow
 					mapView.infoWindow.open(mapClosure, this); // TODO - better loading animation, take out flickers
@@ -582,10 +580,7 @@ function mapApp() {
 					// apply bindings
 					ko.applyBindings(appViewModelContainer, document.getElementById('info-twitter'));
 
-
 				});
-
-
 			};
 
 			console.log(tweets);
@@ -619,23 +614,6 @@ function mapApp() {
 
 			} // end for loop
 
-			self.openInfoWindow = function(content, tweet, context) {
-
-				console.log(tweet);
-
-				// set infoWindow content in viewModel bindings
-				appViewModelContainer.infoWindowTwitterContent.copy = tweet.text;
-
-				// set infoWindow content - includes binding to trigger template
-				mapView.infoWindow.setContent(content);
-
-				// show actual infoWindow
-				mapView.infoWindow.open(mapClosure, context); // TODO - better loading animation, take out flickers
-
-				// apply bindings
-				ko.applyBindings(appViewModelContainer, document.getElementById('info-place'));
-			};
-
 			// for mobile devices/small screens
 			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
 				
@@ -659,13 +637,13 @@ function mapApp() {
 
 			// loop through markers in model data
 			// iterate backwards as allows splice() to be used to remove items without corrupting index
-			for (var i = appViewModelContainer.viewModelPlaceMarkers().length; i >= 0; i--) { 
+			for (var i = appViewModelContainer.viewModelMarkers().length; i >= 0; i--) { 
 
 				inFavourites = false; // reset
 
 				// there will only ever be one pair of object values, however this allows key and value to be separated
-				for (var refMarker in appViewModelContainer.viewModelPlaceMarkers()[i]) {
-					currentMarker = appViewModelContainer.viewModelPlaceMarkers()[i][refMarker]; // marker object
+				for (var refMarker in appViewModelContainer.viewModelMarkers()[i]) {
+					currentMarker = appViewModelContainer.viewModelMarkers()[i][refMarker]; // marker object
 
 					for (var refFav in appViewModelContainer.viewModelFavourites()) { // loop through favourites
 						if (appViewModelContainer.viewModelFavourites()[refFav].key === currentMarker.id) {
@@ -676,7 +654,7 @@ function mapApp() {
 
 					if (inFavourites === false) {
 						currentMarker.setMap(null); // set so do not display on map
-						appViewModelContainer.viewModelPlaceMarkers().splice(i, 1); // remove from marker array
+						appViewModelContainer.viewModelMarkers().splice(i, 1); // remove from marker array
 					}
 				}
 			}			
