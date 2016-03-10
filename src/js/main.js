@@ -148,23 +148,9 @@ function mapApp() {
 		self.viewModelMarkers = ko.observableArray();
 
 		// infoWindow data for bindings
-		self.infoWindowPlaceContent = {
-			name: '',
-			copy: '',
-			url: '',
-			rating: '',
-			photo: '',
-			mapLink: '',
-			address: '',
-			ID: '',
-			type: ''
-		};
+		self.infoWindowPlaceContent = {};
 
-		self.infoWindowTwitterContent = {
-			copy: '',
-			screenName: '',
-			imgURL: ''
-		};
+		self.infoWindowTwitterContent = {};
 
 		// parse values and pass to toggleFavourite()
 		// needed as menu returns this as an object rather than three separate values
@@ -420,7 +406,7 @@ function mapApp() {
 			
 			var self = this;
 
-			console.log(place); // TODO - remove (useful for debugging in dev)
+			console.log(place);
 
 			// remove any pre-existing animation: takes out bug where markers can get stuck in infinite loop
 			for (var k = 0; k < appViewModelContainer.viewModelMarkers().length; k++) {
@@ -500,7 +486,6 @@ function mapApp() {
 			});
 			setTimeout(function(){ self.marker.setAnimation(null); }, 750); // animations plays once only
 
-
 			// pre-set content of infoWindow
 			self.infoWindowTemplatePlace = '<div class="info-content" id="info-place" data-bind="template: { name: \'infoWindow-place\', data: infoWindowPlaceContent }"></div>';
 
@@ -554,7 +539,10 @@ function mapApp() {
 			
 			var self = this;
 
-			self.attachMarker = function(marker, tweet, i) {
+			// to generate actual markers
+			// need separate function as otherwise run into scoping issues
+			// must be before for loop
+			self.showTwitterMarker = function(marker, content, i) {
 
 				// populate array of markers so can be cleared
 				self.forModel = {};
@@ -567,9 +555,9 @@ function mapApp() {
 				google.maps.event.addListener(marker, 'click', function() {
 					var currentMarker = marker;
 					mapView.animateMarker(currentMarker); // marker bounces once on click
-					appViewModelContainer.infoWindowTwitterContent.copy = tweet.text;
-					appViewModelContainer.infoWindowTwitterContent.screenName = tweet.user.screen_name;
-					appViewModelContainer.infoWindowTwitterContent.imgURL = 'https://twitter.com/' + tweet.user.screen_name + '/profile_image?size=bigger';
+					appViewModelContainer.infoWindowTwitterContent.copy = content.text;
+					appViewModelContainer.infoWindowTwitterContent.screenName = content.user.screen_name;
+					appViewModelContainer.infoWindowTwitterContent.imgURL = 'https://twitter.com/' + content.user.screen_name + '/profile_image?size=bigger';
 
 					// set infoWindow content - includes binding to trigger template
 					mapView.infoWindow.setContent(self.infoWindowTemplateTwitter);
@@ -582,10 +570,6 @@ function mapApp() {
 
 				});
 			};
-
-			console.log(tweets);
-
-			self.forModel = {}; // for marker array
 			
 			for (var i = 0; i < tweets.statuses.length; i++) {
 
@@ -610,7 +594,7 @@ function mapApp() {
 				// self.forModel[i] = self.marker; // key: array ID, value: marker content
 				// appViewModelContainer.viewModelTwitterMarkers().push(self.forModel); // populate marker object
 
-				self.attachMarker(self.marker, tweets.statuses[i]);
+				self.showTwitterMarker(self.marker, tweets.statuses[i], i);
 
 			} // end for loop
 
