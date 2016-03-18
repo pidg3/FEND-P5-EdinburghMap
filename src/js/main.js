@@ -26,41 +26,41 @@ function mapApp() {
 		iconLibrary: {
 			Bars: {
 				name: 'Bars',
-				imgBlack: '/images/bar.png',
-				imgFav: '/images/bar-fav.png',
+				imgBlack: 'images/bar.png',
+				imgFav: 'images/bar-fav.png',
 				yelpRefs: ['Bars', 'pubs', 'bars', 'cocktailbars']
 			},
 			Cafes: {
 				name: 'Cafes',
-				imgBlack: '/images/cafe.png',
-				imgFav: '/images/cafe-fav.png',
+				imgBlack: 'images/cafe.png',
+				imgFav: 'images/cafe-fav.png',
 				yelpRefs: ['Cafes', 'cafes', 'coffee', 'tea']
 			},
 			Attractions: {
 				name: 'Attractions',
-				imgBlack: '/images/attraction.png',
-				imgFav: '/images/attraction-fav.png',
+				imgBlack: 'images/attraction.png',
+				imgFav: 'images/attraction-fav.png',
 				yelpRefs: ['Attractions', 'galleries', 'museums', 'landmarks']
 			},
 			Restaurants: {
 				name: 'Restaurants',
-				imgBlack: '/images/restaurant.png',
-				imgFav: '/images/restaurant-fav.png',
+				imgBlack: 'images/restaurant.png',
+				imgFav: 'images/restaurant-fav.png',
 				yelpRefs: ['Restaurants', 'indian', 'indpak', 'mexican','french', 'gastropub', 'english', 'scottish', 'tuskish', 'italian','steak', 'burgers', 'seafood',
 				'british', 'modern_european', 'sandwiches','vegetarian', 'japanese', 'chinese']
 			},
 			Sports: {
 				name: 'Sports',
-				imgBlack: '/images/sports.png',
-				imgFav: '/images/sports-fav.png',
+				imgBlack: 'images/sports.png',
+				imgFav: 'images/sports-fav.png',
 				yelpRefs: ['Sports', 'football', 'stadiumsarenas']
 			}
 		},
 
 		Other: { // used if cannot find a match with other icons
 			name: 'Other',
-			imgBlack: '/images/other.png',
-			imgFav: '/images/other-fav.png'
+			imgBlack: 'images/other.png',
+			imgFav: 'images/other-fav.png'
 		}
 	};	
 
@@ -588,7 +588,7 @@ function mapApp() {
 					map: mapClosure, 
 					position: self.placeLoc,
 					animation: google.maps.Animation.DROP,
-					icon: '/images/tweet.png'
+					icon: 'images/tweet.png'
 				});
 
 				// self.forModel[i] = self.marker; // key: array ID, value: marker content
@@ -658,7 +658,7 @@ function mapApp() {
 
 			var ajaxParameters = {
 				type: 'POST', // needs to be POST so can pass data values
-				url:'/php/yelp.php',
+				url:'php/yelp.php',
 				data: { 
 					type: 'get_business', // 'search' or 'get_business'
 					businessID: ID
@@ -679,7 +679,7 @@ function mapApp() {
 
 			var ajaxParameters = {
 				type: 'POST', // needs to be POST so can pass data values
-				url:'/php/yelp.php',
+				url:'php/yelp.php',
 				data: { 
 					type: 'search', // 'search' or 'get_business'
 					term: query
@@ -702,7 +702,7 @@ function mapApp() {
 
 			var ajaxParameters = {
 				type: 'POST', // needs to be POST so can pass data values
-				url:'/php/twitter.php',
+				url:'php/twitter.php',
 				data: { 
 					number: number // number of results to return
 				}, 
