@@ -13,14 +13,6 @@ var gulp = require('gulp'),
 	rm = require('gulp-rimraf'),
 	gulpsync = require('gulp-sync')(gulp);
 
-// Overall build process - cleans dist then rebuilds
-gulp.task('build', gulpsync.sync(['clean-dist', 'build-dist']));
-
-gulp.task('clean-dist', function() {
-    return gulp.src('dist/*').pipe(rm());
-});
-gulp.task('build-dist', ['HTML', 'styles', 'js']);
-
 // HTML (update JS/CSS links)
 gulp.task('HTML', function() {
 	return gulp.src('src/*.html')
@@ -68,6 +60,9 @@ gulp.task('js', function() {
 // Overall build process
 gulp.task('build', gulpsync.sync(['clean-dist', 'build-dist']));
 gulp.task('clean-dist', function() {
-    return gulp.src('dist/*').pipe(rm());
+    gulp.src('dist/index.html').pipe(rm());
+    gulp.src('dist/js/*').pipe(rm());
+    gulp.src('dist/styles/*').pipe(rm());
+    gulp.src('dist/fonts/*').pipe(rm());
 });
 gulp.task('build-dist', ['HTML', 'styles', 'js']);
