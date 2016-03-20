@@ -79,6 +79,35 @@ function mapApp() {
 
 		self.infoWindowTwitterContent = {};
 
+		// ======== Menu animations ========
+
+		// custom 'menuTransition' binding just needs true/false to be passed
+
+		// menu states
+		// binding reverses state on load so initialised as true i.e. visible
+		self.menu = ko.observable(false);
+		self.favourites = ko.observable(false);
+
+		// click listener
+		self.toggleMenuState = function(element) {
+
+			if (self[element]() === true) {
+				self[element](false);
+			}
+
+			else {
+				self[element](true);
+
+				// set other elements to be hidden
+				if (element === 'favourites') {
+					self.menu(false);
+				}
+				if (element === 'menu') {
+					self.favourites(false);
+				}
+			}
+		};
+
 		// ======== Search functionality ========
 
 		// results shown in menu: includes name/ID/type
@@ -729,73 +758,9 @@ function mapApp() {
 	// i.e. any view stuff except Google Maps and Yelp API
 	var interfaceView = {
 
-		// for transition/animation end functions following, DNRY
+		// for transition/animation end functions following
 		transitionEnd: 'transitionend webkitTransitionEnd otransitionend MSTransitionEnd',
 		animationEnd: 'animationend webkitAnimationEnd oanimationend msAnimationEnd ',
-
-		openMenu: function(DOM) { // need to pass in DOM object
-			DOM.addClass('animating');
-			DOM.addClass('top');
-			DOM.on(interfaceView.transitionEnd, function() {
-				DOM
-				.removeClass('animating top')
-				.addClass('menu-visible');
-				DOM.off(interfaceView.transitionEnd); // removes event handler
-			});
-		},
-
-		closeMenu: function(DOM) { // need to pass in DOM object
-			DOM.addClass('animating');
-			DOM.addClass('bottom');
-			DOM.on(interfaceView.transitionEnd, function() {
-				DOM
-				.removeClass('animating bottom')
-				.removeClass('menu-visible');
-				DOM.off(interfaceView.transitionEnd); // removes event handler
-			});
-		},
-
-		// listens to clicks in main interface hamburger button, then toggles whether menu open
-		menuListener: function() {
-
-			$('#toggle-menu').on('click', function() {
-
-				// open or close main menu
-				var menu = $('#menu');
-				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
-					interfaceView.closeMenu(menu);
-				}
-				else {
-					interfaceView.openMenu(menu);
-				}
-
-				// close favourites if already open
-				var favourites = $('#favourites');
-				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
-					interfaceView.closeMenu(favourites);
-				}
-			});
-		},
-
-		favouritesListener: function() {
-			$('#toggle-favourites').on('click', function() {
-
-				// open or close favourites
-				var favourites = $('#favourites');
-				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
-					interfaceView.closeMenu(favourites);
-				}
-				else {
-					interfaceView.openMenu(favourites);
-				}
-
-				// close main menu if already open
-				var menu = $('#menu');
-				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
-					interfaceView.closeMenu(menu);
-				}
-			});
-		},
 
 		// listens for searches
 		// if menu not open - open it
@@ -803,24 +768,16 @@ function mapApp() {
 		searchListener: function() {
 			$('#search-box').on('submit', function() {
 
+				console.log(appViewModelContainer.menu());
+
 				// open or refresh main menu
-				var menu = $('#menu');
-				if (menu.hasClass('menu-visible')) { // show pulse animation if menu already open: draws attention to change
-					menu.addClass('animated pulse');
-					menu.on(interfaceView.animationEnd, function() {
-						menu
-						.removeClass('animated pulse');
-						menu.off(interfaceView.animationEnd); // removes event handler
-					});
-				}
-				else {
-					interfaceView.openMenu(menu);
+				if (appViewModelContainer.menu() === false) { // show pulse animation if menu already open: draws attention to change
+					appViewModelContainer.menu(true);
 				}
 
 				// close favourites if already open
-				var favourites = $('#favourites');
-				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
-					interfaceView.closeMenu(favourites);
+				if (appViewModelContainer.favourites() === true) { // show pulse animation if menu already open: draws attention to change
+					appViewModelContainer.favourites(false);  // toggle whether moving up or down
 				}
 			});
 		}
@@ -831,8 +788,6 @@ function mapApp() {
 	var mapClosure = mapView.initMap();
 
 	// add menu/search listeners
-	interfaceView.menuListener();
-	interfaceView.favouritesListener();
 	interfaceView.searchListener();
 
 }

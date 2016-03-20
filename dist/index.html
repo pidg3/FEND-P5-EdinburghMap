@@ -23,7 +23,7 @@
 	<!-- ======== Interface drop-downs: initially hidden ======== -->
 
 	<div class="interface-container"> <!-- Main menu -->
-		<div id="menu">
+		<div data-bind="menuTransition: menu" id="menu">
 			<p data-bind="text: currentSearch" class="menu-heading"></p>
 			<hr>
 			<div data-bind="foreach: displayList, css: { 'hidden': menuLoading() === true }" id="search-display">
@@ -39,14 +39,14 @@
 		</div>
 	</div>
 	<div class="interface-container"> <!-- Favourites list -->
-		<div id="favourites">
+		<div data-bind="menuTransition: favourites" id="favourites">
 			<p class="menu-heading">Favourite Places</p>
 			<i class="fa fa-filter" data-bind="click: toggleFilter"></i>
 			<hr>
 			<div data-bind="css: { 'hidden': toggleFilterSwitcher() === false }">
-			    <input type="search" id="search" autocomplete="off" data-bind="value: currentFilter, valueUpdate: 'afterkeydown'">
+				<input type="search" id="search" autocomplete="off" data-bind="value: currentFilter, valueUpdate: 'afterkeydown'">
 				<hr>
-		    </div>
+			</div>
 			<div data-bind="foreach: filteredFavourites" >
 				<div class="place-container">
 					<div data-bind="text: $data.name, click: function(data, event) { $root.placeClick($data.key) }" class="place-name"></div>
@@ -60,16 +60,16 @@
 	<!-- ======== Top bar, containing interface icons and search box ======== -->
 
 	<div class="top-bar">
-		<i id="toggle-menu" class="fa fa-bars fa-3x"></i>
-		<i id="toggle-favourites" class="fa fa-star fa-3x"></i>
+		<i data-bind="click: function(data, event) { toggleMenuState('menu') }" id="toggle-menu" class="fa fa-bars fa-3x"></i>
+		<i data-bind="click: function(data, event) { toggleMenuState('favourites') }" id="toggle-favourites" class="fa fa-star fa-3x"></i>
 		<i data-bind="click: toggleTwitter" id="toggle-twitter" class="fa fa-twitter fa-3x"></i>
 
 		<div class="search-container">
-		    <form data-bind="submit: searchBox" id="search-box">
-			    <input type="search" id="search" data-bind="value: searchQuery">
-			    <span data-bind="click: searchBox" class="icon"><i class="fa fa-search"></i></span>
+			<form data-bind="submit: searchBox" id="search-box">
+				<input type="search" id="search" data-bind="value: searchQuery">
+				<span data-bind="click: searchBox" class="icon"><i class="fa fa-search"></i></span>
 				<submit>
-		    </form>
+			</form>
 		</div>
 
 		<div class="clear-markers" data-bind="click: clearMarkers">
