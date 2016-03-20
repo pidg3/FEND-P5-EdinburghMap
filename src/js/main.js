@@ -1,3 +1,4 @@
+'use strict';
 /*eslint-disable no-console */
 /* exported mapApp mapError */ // called by maps API callback in index.html
 
@@ -21,7 +22,7 @@ mapInit();
 // container for whole app - single global variable
 // called by Google Maps script in mapInit
 function mapApp() {
-	'use strict';
+	
 	
 	var model = {
 
