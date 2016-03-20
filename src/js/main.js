@@ -1,24 +1,28 @@
 /*eslint-disable no-console */
 /* exported mapApp mapError */ // called by maps API callback in index.html
 
-// container for whole app - single global variable
-// called by Google Maps script in index.html
 function mapInit() {
 	var url = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCKaSn7cGU9ER9KVO63fCTQFOPUnOg1q9U&callback=mapApp&libraries=places';
 	$.getScript(url)
 
 	// if getting the script fails
-	// error handling not done via knockout as avoids the need to artificially set bindings for all elements in DOM
+	// initialises a 'mini view model' to avoid having to start whole mapApp function with associated complexities
 	.fail(function() {
-		$('#error-handler p:first-of-type').append('<p>Google Maps seems to have gone AWOL.</p>');
-		$('#error-handler').css('display', 'block');
+		function mapErrorViewModel() {
+			self.errorToggle = ko.observable(1); // initialise in error state
+			self.errorMessage = ko.observable('The Google Maps API is misbehaving.');
+		}
+		ko.applyBindings(mapErrorViewModel, document.getElementById('error-handler')); // only apply bindings to error handling section
 	});
 }
 
 mapInit();
 
+// container for whole app - single global variable
+// called by Google Maps script in mapInit
 function mapApp() {
 	'use strict';
+	
 	var model = {
 
 		// there isn't a high-level category in the yelp API e.g. restaurants
@@ -301,8 +305,7 @@ function mapApp() {
 
 		// ======== LocalStorage for persistent data ========
 
-		// determine whether localStorate available
-
+		// determine whether localStorage available
 		function storageAvailable(type) {
 			try {
 				var storage = window[type],
