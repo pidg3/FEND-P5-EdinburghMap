@@ -1,5 +1,7 @@
 # FEND P5: Edinburgh Map
 
+Hosted version here: http://michaelpidgeon.co.uk/mapapp
+
 This project is for the Udacity Front End Nanodegree.
 
 The idea is:
@@ -8,15 +10,12 @@ The idea is:
 2. To allow the user to save a list of 'favourite places' that will persist over time (currently via localStorage only).
 3. To give me a bit of practice in RESTful API calls, Google maps and learning new JS frameworks.
 
-Current status (as at 10 March 16):
+## Instructions to run/edit the application locally
 
-* About 90% of the way there.
-* Have a hosting solution in place (although exact URL TBC) and have written some basic PHP to obscure the secret keys for Yelp and Twitter.
-* Needs a bit of refactoring and general tidying up.
-
-## If forking/cloning
-
-* You need to set up two new php files in the PHP folder: twitter-keys.php and yelp-keys.php. API keys need to be added in order for the OAuth call to work. The format is described in the respective main PHP files. 
+* Clone the repository as usual
+* Make sure PHP installed and set up local host in the root directory: php -S localhost:8000
+* Secret keys for Yelp and Twitter are not included in the repo to make the application secure. These will need to be added using your own application keys. Two new files need to be added the dist/php folder: yelp-keys.php and twitter-keys.php. These are simply containers for the API keys: the exact format required is described in yelp.php and twitter.php respectively. 
+* Gulpfile contains required modules. 'gulp build' is used to clear dist directory and rebuild from src directory.
 
 ## MV* strategy
 
