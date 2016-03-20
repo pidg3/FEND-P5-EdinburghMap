@@ -22,8 +22,7 @@ mapInit();
 // container for whole app - single global variable
 // called by Google Maps script in mapInit
 function mapApp() {
-	
-	
+
 	var model = {
 
 		// there isn't a high-level category in the yelp API e.g. restaurants
@@ -67,18 +66,47 @@ function mapApp() {
 			imgBlack: 'images/other.png',
 			imgFav: 'images/other-fav.png'
 		}
-	};	
+	};
 
 	// delared as function as per KnockoutJS documentation
 	function appViewModel() {
-		var self = this; 
+		var self = this;
 
-		self.displayList = ko.observableArray(); // results shown in menu: includes name/ID/type
+		// ======== infoWindow content holders ========
+
+		// infoWindow data for bindings
+		self.infoWindowPlaceContent = {};
+
+		self.infoWindowTwitterContent = {};
+
+		// ======== Search functionality ========
+
+		// results shown in menu: includes name/ID/type
+		self.displayList = ko.observableArray();
+
+		// holds search query for entry into searchBox() function below
+		self.searchQuery = ko.observable();
+
+		// set by search query, only used for display via binding, separated from searchQuery allow reset of search box text between queries
+		self.currentSearch = ko.observable('Search for something to get started...');
+
+		// container for marker objects
+		self.viewModelMarkers = ko.observableArray();
+
+		// toggle loading status for menu
+		self.menuLoading = ko.observable(false);
+
+		// triggered by search bar entry
+		// sets name of search in menu and triggers mainSearch()
+		self.searchBox = function() {
+			self.currentSearch(self.searchQuery()); // sets currentSearch to whatever is entered - used to display name of search
+			self.searchQuery(''); // resets text to blank
+			self.mainSearch(self.currentSearch()); // carries out actual search
+		};
 
 		// search entered: carries out search using Yelp API and returns results in menu list
 		self.mainSearch = function(query) {
-			$('#search-display').addClass('hidden'); // shows loading spinner and hides search results
-			$('#search-loading').removeClass('hidden');
+			self.menuLoading(true); // shows loading spinner and hides search results
 
 			yelpView.search(query, function(result) { // callback function - executes when Yelp data returned
 				console.log(result);
@@ -94,28 +122,13 @@ function mapApp() {
 					self.displayList.push(tempItem);
 				}
 
-				$('#search-display').removeClass('hidden'); // hides loading spinner and shows search results
-				$('#search-loading').addClass('hidden');
-
+				self.menuLoading(false); // hides loading spinner and shows search results
 			});
-		};
-
-		// holds search query for entry into searchBox() function below
-		self.searchQuery = ko.observable();
- 
-		// set by search query, only used for display via binding, allows reset of search box text between queries
-		self.currentSearch = ko.observable('Search for something to get started...'); 
-
-		// triggered by search bar entry
-		self.searchBox = function() {
-			self.currentSearch(self.searchQuery()); // sets currentSearch to whatever is entered - used to display name of search
-			self.searchQuery(''); // resets text to blank
-			self.mainSearch(self.currentSearch()); // carries out actual search
 		};
 
 		// displays marker for specific business when name clicked, query by ID
 		self.placeClick = function(ID) {
-			
+
 			var alreadyMarker = false;
 			var currentMarker;
 
@@ -129,7 +142,7 @@ function mapApp() {
 
 			if (alreadyMarker === false) {
 				yelpView.get_business(ID, function(result) { // create new marker via Yelp callback
-					mapView.createPlaceMarker(result); 
+					mapView.createPlaceMarker(result);
 				});
 			}
 			else if (alreadyMarker === true) { // do not create marker emphasise existing marker
@@ -138,24 +151,18 @@ function mapApp() {
 
 				// if mobile device: close menu
 				if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
-					
-					interfaceView.closeMenu($('#menu')); 
+
+					interfaceView.closeMenu($('#menu'));
 					interfaceView.closeMenu($('#favourites'));
 				}
 
 			}
 		};
 
-		// favourite places implementation
+		// ======== Favourite places ========
+
+		// holds favourites in array (populated from localStorage on page load)
 		self.viewModelFavourites = ko.observableArray();
-
-		// container for marker objects
-		self.viewModelMarkers = ko.observableArray();
-
-		// infoWindow data for bindings
-		self.infoWindowPlaceContent = {};
-
-		self.infoWindowTwitterContent = {};
 
 		// parse values and pass to toggleFavourite()
 		// needed as menu returns this as an object rather than three separate values
@@ -182,13 +189,12 @@ function mapApp() {
 				mainType = model.Other.name;
 			}
 
-
 			self.toggleFavourite(favourite.name, favourite.key, mainType);
 		};
 
 		// toggles whether a place is included in model.favouriteList
 		// MUST pass in name, ID and type strings, in that order
-		self.toggleFavourite = function(name, ID, type) { // generic function to toggle whether a place name is included in favourites
+		self.toggleFavourite = function(name, ID, type) {
 
 			// work out if key already in favourites array
 			var favIndex = null;
@@ -225,7 +231,7 @@ function mapApp() {
 			else {
 				var newFavourite = {
 					key: ID,
-					name: name, 
+					name: name,
 					type: type
 				};
 				self.viewModelFavourites().push(newFavourite); // push to model data
@@ -267,7 +273,8 @@ function mapApp() {
 
 		// ======== Favourites filter ========
 
-		// display
+		self.currentFilter = ko.observable(); // value typed into filter box
+
 		self.toggleFilterSwitcher = ko.observable(false); // true = favourites filter displayed
 		self.toggleFilter = function() {
 			if (self.toggleFilterSwitcher() === false) {
@@ -279,13 +286,11 @@ function mapApp() {
 			}
 		};
 
-		self.currentFilter = ko.observable(); // value typed into filter box
-
 		self.filteredFavourites = ko.computed(function() {
 			if(!self.currentFilter()) {  // no filter entered - main favourites array returned
-				return self.viewModelFavourites(); 
+				return self.viewModelFavourites();
 			}
-			else { // filter entered: 
+			else { // filter entered:
 				return ko.utils.arrayFilter(self.viewModelFavourites(), function(favourite) {
 
 					var re = new RegExp(self.currentFilter() , 'i'); // define new regex for filter input
@@ -320,7 +325,7 @@ function mapApp() {
 			}
 		}
 
-		
+
 		if (storageAvailable('localStorage')) {
 
 			// populate from localStorage, if available and populated
@@ -344,8 +349,6 @@ function mapApp() {
 				console.log(result);
 				mapView.createTwitterMarkers(result);
 			});
-
-
 		};
 
 		// ======== Error handling ========
@@ -407,7 +410,7 @@ function mapApp() {
 		// determine which icon to use based on data in model
 		// have to pass in single Yelp place object
 		createPlaceMarker: function(place) {
-			
+
 			var self = this;
 
 			console.log(place);
@@ -420,7 +423,7 @@ function mapApp() {
 					appViewModelContainer.viewModelMarkers()[k][refMarker].setAnimation(null); // reset animation
 				}
 			}
-				
+
 			self.type; // place type as per definitions in model
 			self.iconURL = '';
 
@@ -445,7 +448,7 @@ function mapApp() {
 			}
 
 			// if match not found, set to default symbol
-			if (self.iconURL === '') { 
+			if (self.iconURL === '') {
 				self.type = model.Other.name;
 				self.iconURL = model.Other; // prepare to set to correct icon
 			}
@@ -466,22 +469,22 @@ function mapApp() {
 			}
 
 			// get location from Yelp object
-			self.placeLoc = new google.maps.LatLng(place.location.coordinate.latitude, place.location.coordinate.longitude); 
+			self.placeLoc = new google.maps.LatLng(place.location.coordinate.latitude, place.location.coordinate.longitude);
 
 			// set map to marker location
 			mapClosure.panTo(self.placeLoc);
 
 			// for mobile devices/small screens
 			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
-				
+
 				// close menu (avoid obscuring markers)
-				interfaceView.closeMenu($('#menu')); 
+				interfaceView.closeMenu($('#menu'));
 				interfaceView.closeMenu($('#favourites'));
 			}
 
 			// create actual marker
 			self.marker = new google.maps.Marker({
-				map: mapClosure, 
+				map: mapClosure,
 				position: self.placeLoc,
 				animation: google.maps.Animation.BOUNCE,
 				icon: self.iconURL, // custom variable marker as defined above
@@ -532,15 +535,15 @@ function mapApp() {
 
 			// for mobile devices/small screens
 			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
-				
+
 				// close menu (avoid obscuring markers)
-				interfaceView.closeMenu($('#menu')); 
+				interfaceView.closeMenu($('#menu'));
 				interfaceView.closeMenu($('#favourites'));
 			}
 		},
 
 		createTwitterMarkers: function(tweets) {
-			
+
 			var self = this;
 
 			// to generate actual markers
@@ -568,19 +571,19 @@ function mapApp() {
 
 					// show actual infoWindow
 					mapView.infoWindow.open(mapClosure, this); // TODO - better loading animation, take out flickers
-					
+
 					// apply bindings
 					ko.applyBindings(appViewModelContainer, document.getElementById('info-twitter'));
 
 				});
 			};
-			
+
 			for (var i = 0; i < tweets.statuses.length; i++) {
 
 				// get location from tweet object
 				// if/else needed as sometimes tweets do not have coordinates; is so set to centre of map
 				if (tweets.statuses[i].geo) {
-					self.placeLoc = new google.maps.LatLng(tweets.statuses[i].geo.coordinates[0], tweets.statuses[i].geo.coordinates[1]); 
+					self.placeLoc = new google.maps.LatLng(tweets.statuses[i].geo.coordinates[0], tweets.statuses[i].geo.coordinates[1]);
 				}
 
 				else {
@@ -589,7 +592,7 @@ function mapApp() {
 
 				// create actual marker
 				self.marker = new google.maps.Marker({
-					map: mapClosure, 
+					map: mapClosure,
 					position: self.placeLoc,
 					animation: google.maps.Animation.DROP,
 					icon: 'images/tweet.png'
@@ -604,9 +607,9 @@ function mapApp() {
 
 			// for mobile devices/small screens
 			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
-				
+
 				// close menu (avoid obscuring markers)
-				interfaceView.closeMenu($('#menu')); 
+				interfaceView.closeMenu($('#menu'));
 				interfaceView.closeMenu($('#favourites'));
 			}
 		},
@@ -614,7 +617,7 @@ function mapApp() {
 
 		animateMarker: function(marker) {
 			marker.setAnimation(google.maps.Animation.BOUNCE); // start animation
-			setTimeout(function(){ marker.setAnimation(null); }, 750); // animations plays once only	
+			setTimeout(function(){ marker.setAnimation(null); }, 750); // animations plays once only
 		},
 
 		// clear all markers TODO - build in functionality to leave favourites alone (differnt colour?)
@@ -625,7 +628,7 @@ function mapApp() {
 
 			// loop through markers in model data
 			// iterate backwards as allows splice() to be used to remove items without corrupting index
-			for (var i = appViewModelContainer.viewModelMarkers().length; i >= 0; i--) { 
+			for (var i = appViewModelContainer.viewModelMarkers().length; i >= 0; i--) {
 
 				inFavourites = false; // reset
 
@@ -645,7 +648,7 @@ function mapApp() {
 						appViewModelContainer.viewModelMarkers().splice(i, 1); // remove from marker array
 					}
 				}
-			}			
+			}
 		}
 	};
 
@@ -663,12 +666,12 @@ function mapApp() {
 			var ajaxParameters = {
 				type: 'POST', // needs to be POST so can pass data values
 				url:'php/yelp.php',
-				data: { 
+				data: {
 					type: 'get_business', // 'search' or 'get_business'
 					businessID: ID
-				}, 
+				},
 				dataType:'JSON',
-				success: callback		
+				success: callback
 			};
 
 			// Send AJAX query via jQuery library.
@@ -684,10 +687,10 @@ function mapApp() {
 			var ajaxParameters = {
 				type: 'POST', // needs to be POST so can pass data values
 				url:'php/yelp.php',
-				data: { 
+				data: {
 					type: 'search', // 'search' or 'get_business'
 					term: query
-				}, 
+				},
 				dataType:'JSON',
 				success: callback
 			};
@@ -700,18 +703,18 @@ function mapApp() {
 		}
 	};
 
-	// twitter API calls 
+	// twitter API calls
 	var twitterView = {
 		search: function(number, callback) { // search by specific ID - must match exactly
 
 			var ajaxParameters = {
 				type: 'POST', // needs to be POST so can pass data values
 				url:'php/twitter.php',
-				data: { 
+				data: {
 					number: number // number of results to return
-				}, 
+				},
 				dataType:'JSON',
-				success: callback		
+				success: callback
 			};
 
 			// Send AJAX query via jQuery library.
@@ -761,7 +764,7 @@ function mapApp() {
 				var menu = $('#menu');
 				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
 					interfaceView.closeMenu(menu);
-				} 
+				}
 				else {
 					interfaceView.openMenu(menu);
 				}
@@ -770,7 +773,7 @@ function mapApp() {
 				var favourites = $('#favourites');
 				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
 					interfaceView.closeMenu(favourites);
-				} 
+				}
 			});
 		},
 
@@ -781,7 +784,7 @@ function mapApp() {
 				var favourites = $('#favourites');
 				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
 					interfaceView.closeMenu(favourites);
-				} 
+				}
 				else {
 					interfaceView.openMenu(favourites);
 				}
@@ -790,7 +793,7 @@ function mapApp() {
 				var menu = $('#menu');
 				if (menu.hasClass('menu-visible')) { // toggle whether moving up or down
 					interfaceView.closeMenu(menu);
-				} 
+				}
 			});
 		},
 
@@ -818,7 +821,7 @@ function mapApp() {
 				var favourites = $('#favourites');
 				if (favourites.hasClass('menu-visible')) { // toggle whether moving up or down
 					interfaceView.closeMenu(favourites);
-				} 
+				}
 			});
 		}
 	};
@@ -828,7 +831,7 @@ function mapApp() {
 	var mapClosure = mapView.initMap();
 
 	// add menu/search listeners
-	interfaceView.menuListener(); 
+	interfaceView.menuListener();
 	interfaceView.favouritesListener();
 	interfaceView.searchListener();
 
