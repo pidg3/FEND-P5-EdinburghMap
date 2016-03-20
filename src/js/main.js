@@ -108,6 +108,17 @@ function mapApp() {
 			}
 		};
 
+		// close both menus (used for mobile version to maximise screen real estate)
+		self.closeMenus = function() {
+			if (self.menu() === true) {
+				self.menu(false);
+			}
+			if (self.favourites() === true) {
+				self.favourites(false);
+			}
+
+		};
+
 		// ======== Search functionality ========
 
 		// results shown in menu: includes name/ID/type
@@ -180,9 +191,7 @@ function mapApp() {
 
 				// if mobile device: close menu
 				if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
-
-					interfaceView.closeMenu($('#menu'));
-					interfaceView.closeMenu($('#favourites'));
+					self.closeMenus;
 				}
 
 			}
@@ -285,7 +294,6 @@ function mapApp() {
 				localStorage.setItem('favourites', JSON.stringify(self.viewModelFavourites()));
 				console.log('Local storage updated');
 			}
-
 		};
 
 		// takes ID - returns true if included in favourites
@@ -334,7 +342,6 @@ function mapApp() {
 						return false;
 					}
 				});
-
 			}
 		});
 
@@ -353,7 +360,6 @@ function mapApp() {
 				return false;
 			}
 		}
-
 
 		if (storageAvailable('localStorage')) {
 
@@ -395,9 +401,6 @@ function mapApp() {
 
 			self.errorToggle(1); // triggers changes in display for both map and error-handler divs
 
-			$('#toggle-menu').off(); // remove event handlers
-			$('#toggle-favourites').off();
-			$('#search-box').off();
 		};
 
 		// link to mapView - clear out all current markers
@@ -506,9 +509,8 @@ function mapApp() {
 			// for mobile devices/small screens
 			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
 
-				// close menu (avoid obscuring markers)
-				interfaceView.closeMenu($('#menu'));
-				interfaceView.closeMenu($('#favourites'));
+				// close menus (avoid obscuring markers)
+				appViewModelContainer.closeMenus();
 			}
 
 			// create actual marker
@@ -565,9 +567,8 @@ function mapApp() {
 			// for mobile devices/small screens
 			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
 
-				// close menu (avoid obscuring markers)
-				interfaceView.closeMenu($('#menu'));
-				interfaceView.closeMenu($('#favourites'));
+				// close menus (avoid obscuring markers)
+				appViewModelContainer.closeMenus();
 			}
 		},
 
@@ -638,8 +639,7 @@ function mapApp() {
 			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
 
 				// close menu (avoid obscuring markers)
-				interfaceView.closeMenu($('#menu'));
-				interfaceView.closeMenu($('#favourites'));
+				appViewModelContainer.closeMenus();
 			}
 		},
 
