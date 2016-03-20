@@ -139,6 +139,12 @@ function mapApp() {
 		// triggered by search bar entry
 		// sets name of search in menu and triggers mainSearch()
 		self.searchBox = function() {
+
+			// opens menu if not already opened
+			if (self.menu() === false) {
+				self.toggleMenuState('menu');
+			}
+
 			self.currentSearch(self.searchQuery()); // sets currentSearch to whatever is entered - used to display name of search
 			self.searchQuery(''); // resets text to blank
 			self.mainSearch(self.currentSearch()); // carries out actual search
@@ -754,40 +760,8 @@ function mapApp() {
 		}
 	};
 
-	// all view to do with interface
-	// i.e. any view stuff except Google Maps and Yelp API
-	var interfaceView = {
-
-		// for transition/animation end functions following
-		transitionEnd: 'transitionend webkitTransitionEnd otransitionend MSTransitionEnd',
-		animationEnd: 'animationend webkitAnimationEnd oanimationend msAnimationEnd ',
-
-		// listens for searches
-		// if menu not open - open it
-		// if menu open - pulse animation
-		searchListener: function() {
-			$('#search-box').on('submit', function() {
-
-				console.log(appViewModelContainer.menu());
-
-				// open or refresh main menu
-				if (appViewModelContainer.menu() === false) { // show pulse animation if menu already open: draws attention to change
-					appViewModelContainer.menu(true);
-				}
-
-				// close favourites if already open
-				if (appViewModelContainer.favourites() === true) { // show pulse animation if menu already open: draws attention to change
-					appViewModelContainer.favourites(false);  // toggle whether moving up or down
-				}
-			});
-		}
-	};
-
-
-	// hold map closure - allows map to be accessed by other functions
+	// initialise map
+	// hold map in closure - allows map to be accessed by other functions
 	var mapClosure = mapView.initMap();
-
-	// add menu/search listeners
-	interfaceView.searchListener();
 
 }

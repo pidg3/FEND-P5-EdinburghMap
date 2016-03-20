@@ -19,13 +19,13 @@ The idea is:
 
 ## MV* strategy
 
-KnockoutJS used as framework as per Udacity project rubric. JS currently divided into five sections:
+KnockoutJS used as framework as per Udacity project rubric. JS  divided into five sections:
 
 1. model. As per standard. Will eventually interface with localstorate and/or Firebase.
 2. appViewModel. Standard KnockoutJS ViewModel. Function rather than object as per specification. Binds everything together, including the DOM. 
 3. mapView. Everything to do with Google Maps API calls.
-4. yelpView. Everything to do with Google Maps API calls.
-5. interfaceView. All other interface (view) functionality outside of ViewModel. 
+4. yelpView. Everything to do with Yelp API calls.
+5. twitterView. Everything to do with Twitter calls.
 
 ## Known issues
 
