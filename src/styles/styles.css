@@ -58,7 +58,9 @@ table {
 
 /* ======== General styles ======== */
 
-html, body, input {
+html,
+body,
+input {
 	height: 100%;
 	font-family: 'Raleway', sans-serif;
 	color: #252525;
@@ -281,8 +283,6 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	.info-content .info-yelp {
 		width: 90px;
 	}
-	
-	
 }
 
 /* ======== Star colour changer - both infoWindow and menu ======== */
@@ -291,7 +291,7 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	color: yellow !important; /* override default colour */
 }
 .star-yellow:hover  {
-	color: #FFFF83 !important; 
+	color: #FFFF83 !important;
 }
 
 /* ======== Drop down interface ======== */
@@ -301,14 +301,14 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	top: -480px; /* Hide off-screen initially */
 }
 
-#search-loading {
+.search-loading {
 	text-align: center;
 	font-size: 84px;
 	width: 100%;
 	padding: 100px 0;
 }
 
-#menu { /* deliberately delcared as ID a) for jQuery selectors b) to override other classes */
+.menu { /* deliberately delcared as ID a) for jQuery selectors b) to override other classes */
 	z-index: 1;
 	position: relative;
 	background-color: white;
@@ -321,7 +321,7 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	padding: 10px 25px;
 }
 
-#favourites {
+.favourites {
 	z-index: 2;
 	position: relative;
 	background-color: white;
@@ -333,7 +333,7 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	box-shadow: 0 5px 5px #888888;
 	padding: 10px 25px;
 	left: 60px;
-}	
+}
 
 .menu-heading {
 	font-weight: 700;

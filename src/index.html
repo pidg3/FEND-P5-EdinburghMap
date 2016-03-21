@@ -34,7 +34,7 @@
 	<!-- ======== Interface drop-downs: initially hidden ======== -->
 
 	<div class="interface-container"> <!-- Main menu -->
-		<div data-bind="menuTransition: menu" id="menu">
+		<div data-bind="menuTransition: menu" class="menu" id="menu">
 			<p data-bind="text: currentSearch" class="menu-heading"></p>
 			<hr>
 			<div data-bind="foreach: displayList, css: { 'hidden': menuLoading() === true }" id="search-display">
@@ -43,14 +43,14 @@
 					<i data-bind="click: function(data, event) { $root.menuFavourite($data) }, css: { 'star-yellow': $root.favouriteChecker($data.key) === true }" class="fa fa-star star-menu"></i> <!-- Pass index -->
 				</div>
 			</div>
-			<div data-bind="css: { 'hidden': menuLoading() === false }" id="search-loading">
+			<div data-bind="css: { 'hidden': menuLoading() === false }" class ="search-loading" id="search-loading">
 				<i class="fa fa-refresh fa-spin"></i>
 			</div>
 
 		</div>
 	</div>
 	<div class="interface-container"> <!-- Favourites list -->
-		<div data-bind="menuTransition: favourites" id="favourites">
+		<div data-bind="menuTransition: favourites" class="favourites" id="favourites">
 			<p class="menu-heading">Favourite Places</p>
 			<i class="fa fa-filter" data-bind="click: toggleFilter"></i>
 			<hr>
