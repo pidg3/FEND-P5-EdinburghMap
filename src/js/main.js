@@ -24,6 +24,12 @@ mapInit();
 // called by Google Maps script in mapInit
 function mapApp() {
 
+	/***********************************
+
+	MODEL DATA
+
+	***********************************/
+
 	var model = {
 
 		// there isn't a high-level category in the yelp API e.g. restaurants
@@ -132,6 +138,12 @@ function mapApp() {
 			}
 		]
 	};
+
+	/***********************************
+
+	APP VIEW MODEL
+
+	***********************************/
 
 	// delared as function as per KnockoutJS documentation
 	function appViewModel() {
@@ -554,7 +566,12 @@ function mapApp() {
 	var appViewModelContainer = new appViewModel();
 	ko.applyBindings(appViewModelContainer);
 
-	// for all Google Maps API functionality
+	/***********************************
+
+	GOOGLE MAPS FUNCTIONALITY
+
+	***********************************/
+
 	var mapView = {
 
 		edinburgh: new google.maps.LatLng(55.944201, -3.197536), // hard-coded to Edinburgh
@@ -798,6 +815,13 @@ function mapApp() {
 		}
 	};
 
+
+	/***********************************
+
+	YELP API
+
+	***********************************/
+
 	// all Yelp API calls
 	// as a design principle data is NOT processed/parsed here but instead raw JSON return passed to other functions
 	// API calls made via a PHP handler
@@ -849,7 +873,12 @@ function mapApp() {
 		}
 	};
 
-	// twitter API calls
+	/***********************************
+
+	TWITTER API
+
+	***********************************/
+
 	var twitterView = {
 		search: function(number, callback) { // search by specific ID - must match exactly
 
