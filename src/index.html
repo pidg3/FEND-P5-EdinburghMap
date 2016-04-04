@@ -55,7 +55,7 @@
 			<i class="fa fa-filter" data-bind="click: toggleFilter"></i>
 			<hr>
 			<div data-bind="css: { 'hidden': toggleFilterSwitcher() === false }">
-				<input type="search" id="search" autocomplete="off" data-bind="value: currentFilter, valueUpdate: 'afterkeydown'">
+				<input type="search" placeholder="Filter" class="filter-search" autocomplete="off" data-bind="value: currentFilter, valueUpdate: 'afterkeydown'">
 				<hr>
 			</div>
 			<div data-bind="foreach: filteredFavourites" >
@@ -77,7 +77,7 @@
 
 		<div class="search-container">
 			<form data-bind="submit: searchBox" id="search-box">
-				<input type="search" id="search" data-bind="value: searchQuery">
+				<input type="search" class="main-search" data-bind="value: searchQuery">
 				<span data-bind="click: searchBox" class="icon"><i class="fa fa-search"></i></span>
 				<submit>
 			</form>
