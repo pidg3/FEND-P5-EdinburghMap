@@ -1,6 +1,6 @@
 'use strict';
 /*eslint-disable no-console */
-/*global ko $ google*/
+/*global ko $ google _*/
 /* exported mapApp mapError */ // called by maps API callback in index.html
 
 function mapInit() {
@@ -388,6 +388,12 @@ function mapApp() {
 
 		self.filteredFavourites = ko.computed(function() {
 			if(!self.currentFilter()) {  // no filter entered - main favourites array returned
+
+				// reset ALL markers to be visible when no filter entered
+				if (self.resetMarkerVisibility) {
+					self.resetMarkerVisibility();
+				}
+
 				return self.viewModelFavourites();
 			}
 			else { // filter entered:
@@ -396,17 +402,52 @@ function mapApp() {
 					var re = new RegExp(self.currentFilter() , 'i'); // define new regex for filter input
 
 					if (re.test(favourite.name)) {  // name regex match
+						self.markerVisibility(favourite.key, true);
 						return true;
 					}
 					else if (re.test(favourite.type)) { // type regex match
+						self.markerVisibility(favourite.key, true);
 						return true;
 					}
 					else { // no match
+						self.markerVisibility(favourite.key, false);
 						return false;
 					}
 				});
 			}
 		});
+
+		// control whether markers are visible
+		// passing status = false sets 'Map' value of marker to null
+		self.markerVisibility = function(key, status) {
+
+			// get marker object from
+			var currentMarker = _.find(self.viewModelMarkers(), function(o) {
+				var keyString = Object.keys(o)[0];
+				return keyString === key;
+			});
+
+			// setting Map to null removes from display (this is recommended solution in GM docs)
+			if (status === false) {
+				currentMarker[key].setMap(null);
+			}
+
+			// setting Map to mapClosure displays as normal (this is default value)
+			else {
+				currentMarker[key].setMap(mapClosure);
+			}
+		};
+
+		self.resetMarkerVisibility = function() {
+			for (var i = 0; i < self.viewModelMarkers().length; i++) {
+
+				// get object value (i.e. map marker)
+				var marker = self.viewModelMarkers()[i][Object.keys(self.viewModelMarkers()[i])];
+
+				// make marker visible
+				marker.setMap(mapClosure);
+			}
+		};
 
 		// ======== LocalStorage for persistent data ========
 

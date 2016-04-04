@@ -25,7 +25,8 @@
     "animate.css": "^3.5.1",
     "knockout": "^3.4.0",
     "bower": "*",
-    "font-awesome": "fontawesome#^4.5.0"
+    "font-awesome": "fontawesome#^4.5.0",
+    "lodash": "^4.8.0"
   },
   "overrides": {
     "font-awesome": {
