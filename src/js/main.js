@@ -239,6 +239,8 @@ function mapApp() {
 		// displays marker for specific business when name clicked, query by ID
 		self.placeClick = function(ID) {
 
+			console.log(ID);
+
 			var alreadyMarker = false;
 			var currentMarker;
 
@@ -440,12 +442,23 @@ function mapApp() {
 				self.viewModelFavourites(JSON.parse(localStorage.getItem('favourites')));
 				console.log('Default favourites pushed to local storage');
 			}
+
 		}
 
 		// display log message if functionality not available
 		else {
 			console.log('No local storage available.');
 		}
+
+		// create initial place markers from favourites
+		// called at end of file (so requirements have finished loading)
+		self.createInitialMarkers = function() {
+			if (self.viewModelFavourites()) {
+				for (var i = 0; i < self.viewModelFavourites().length; i++) {
+					self.placeClick(self.viewModelFavourites()[i].key);
+				}
+			}
+		};
 
 		// ======== Twitter integration ========
 
@@ -569,9 +582,6 @@ function mapApp() {
 
 			// get location from Yelp object
 			self.placeLoc = new google.maps.LatLng(place.location.coordinate.latitude, place.location.coordinate.longitude);
-
-			// set map to marker location
-			mapClosure.panTo(self.placeLoc);
 
 			// for mobile devices/small screens
 			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) <= 600) {
@@ -823,5 +833,6 @@ function mapApp() {
 	// initialise map
 	// hold map in closure - allows map to be accessed by other functions
 	var mapClosure = mapView.initMap();
+	appViewModelContainer.createInitialMarkers();
 
 }
