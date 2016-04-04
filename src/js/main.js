@@ -1,5 +1,6 @@
 'use strict';
 /*eslint-disable no-console */
+/*global ko $ google*/
 /* exported mapApp mapError */ // called by maps API callback in index.html
 
 function mapInit() {
@@ -65,7 +66,71 @@ function mapApp() {
 			name: 'Other',
 			imgBlack: 'images/other.png',
 			imgFav: 'images/other-fav.png'
-		}
+		},
+
+		// used to pre-populate favourits if not already defined
+		defaultFavourites: [
+			{
+				'key': 'national-museum-of-scotland-edinburgh',
+				'name': 'National Museum of Scotland',
+				'type': 'Attractions'
+			},
+			{
+				'key': 'wellington-coffee-edinburgh',
+				'name': 'Wellington Coffee',
+				'type': 'Cafes'
+			},
+			{
+				'key': 'artisan-roast-edinburgh',
+				'name': 'Artisan Roast',
+				'type': 'Cafes'
+			},
+			{
+				'key': 'saint-giles-cafe-bar-edinburgh',
+				'name': 'Saint Giles Cafe Bar',
+				'type': 'Cafes'
+			},
+			{
+				'key': 'edinburgh-castle-edinburgh',
+				'name': 'Edinburgh Castle',
+				'type': 'Other'
+			},
+			{
+				'key': 'camera-obscura-edinburgh',
+				'name': 'Camera Obscura',
+				'type': 'Attractions'
+			},
+			{
+				'key': 'royal-botanic-garden-edinburgh-edinburgh',
+				'name': 'Royal Botanic Garden Edinburgh',
+				'type': 'Other'
+			},
+			{
+				'key': 'la-barantine-edinburgh',
+				'name': 'La Barantine',
+				'type': 'Cafes'
+			},
+			{
+				'key': 'the-hanging-bat-beer-cafe-edinburgh',
+				'name': 'The Hanging Bat Beer Cafe',
+				'type': 'Bars'
+			},
+			{
+				'key': 'the-jazz-bar-edinburgh',
+				'name': 'The Jazz Bar',
+				'type': 'Bars'
+			},
+			{
+				'key': 'the-jolly-botanist-edinburgh',
+				'name': 'The Jolly Botanist',
+				'type': 'Bars'
+			},
+			{
+				'key': 'hibernian-fc-edinburgh',
+				'name': 'Hibernian FC',
+				'type': 'Sports'
+			}
+		]
 	};
 
 	// delared as function as per KnockoutJS documentation
@@ -223,7 +288,7 @@ function mapApp() {
 				var mainType = self.getType(favourite.type); // used for type category as listed in model
 				self.toggleFavourite(favourite.name, favourite.key, mainType);
 			}
-			
+
 		};
 
 		// toggles whether a place is included in model.favouriteList
@@ -360,11 +425,20 @@ function mapApp() {
 		if (storageAvailable('localStorage')) {
 
 			// populate from localStorage, if available and populated
-			if(localStorage.getItem('favourites')) {
+			if (localStorage.getItem('favourites') !== null && localStorage.getItem('favourites') !== '[]') {
 				console.log('Favourites updated from local storage');
 
 				// localStorage as string so needs to be parsed
 				self.viewModelFavourites(JSON.parse(localStorage.getItem('favourites')));
+			}
+
+			// if not already defined, populate from defaults
+			else {
+
+				// localStorage as string so JSON needs to be stringified
+				localStorage.setItem('favourites', JSON.stringify(model.defaultFavourites));
+				self.viewModelFavourites(JSON.parse(localStorage.getItem('favourites')));
+				console.log('Default favourites pushed to local storage');
 			}
 		}
 
