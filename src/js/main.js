@@ -239,8 +239,6 @@ function mapApp() {
 		// displays marker for specific business when name clicked, query by ID
 		self.placeClick = function(ID) {
 
-			console.log(ID);
-
 			var alreadyMarker = false;
 			var currentMarker;
 
@@ -253,8 +251,10 @@ function mapApp() {
 			}
 
 			if (alreadyMarker === false) {
+				console.log('placeClick');
 				yelpView.get_business(ID, function(result) { // create new marker via Yelp callback
 					mapView.createPlaceMarker(result);
+					console.log('placeClick result');
 				});
 			}
 			else if (alreadyMarker === true) { // do not create marker emphasise existing marker
@@ -294,8 +294,6 @@ function mapApp() {
 		// toggles whether a place is included in model.favouriteList
 		// MUST pass in name, ID and type strings, in that order
 		self.toggleFavourite = function(name, ID, type) {
-
-			console.log(ID);
 
 			// work out if key already in favourites array
 			var favIndex = null;
@@ -672,8 +670,6 @@ function mapApp() {
 				// not used for window but needed for favourite functionality
 				appViewModelContainer.infoWindowPlaceContent.ID = place.id;
 				appViewModelContainer.infoWindowPlaceContent.type = appViewModelContainer.getType(place.categories);
-
-				console.log(appViewModelContainer.infoWindowPlaceContent.type);
 
 				// set infoWindow content - includes binding to trigger template
 				mapView.infoWindow.setContent(content);

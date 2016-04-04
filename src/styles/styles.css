@@ -258,6 +258,10 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 	clear: both;
 }
 
+.info-content> .twitter-attribution {
+	font-weight: 700;
+}
+
 @media (max-width: 600px) {
 	.info-content h4 {
 		font-size: 16px;
