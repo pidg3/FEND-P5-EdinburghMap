@@ -57,7 +57,7 @@ function mapApp() {
 				name: 'Sports',
 				imgBlack: 'images/sports.png',
 				imgFav: 'images/sports-fav.png',
-				yelpRefs: ['Sports', 'football', 'stadiumsarenas']
+				yelpRefs: ['Sports', 'football', 'stadiumsarenas', 'sports_clubs']
 			}
 		},
 
@@ -155,7 +155,6 @@ function mapApp() {
 			self.menuLoading(true); // shows loading spinner and hides search results
 
 			yelpView.search(query, function(result) { // callback function - executes when Yelp data returned
-				console.log(result);
 				self.displayList([]); // reset list before re-populate
 				var tempItem; // holder var for current dataset
 
@@ -163,7 +162,7 @@ function mapApp() {
 					tempItem = {
 						key: result.businesses[i].id,
 						name: result.businesses[i].name,
-						type: result.businesses[i].categories[0][1] // only get primary type, not array of options
+						type: result.businesses[i].categories // only get primary type, not array of options
 					};
 					self.displayList.push(tempItem);
 				}
@@ -215,25 +214,16 @@ function mapApp() {
 
 			console.log(favourite);
 
-			var mainType = ''; // used for type category as listed in model
-
-			for (var categoryRef in model.iconLibrary) { // loop through outer iconLibrary object
-				for (var i = 0; i < model.iconLibrary[categoryRef].yelpRefs.length; i++) { // loop through yelp categories array
-					if (favourite.type === model.iconLibrary[categoryRef].yelpRefs[i]) { // if specific place category matches iconLibrary category
-						mainType = model.iconLibrary[categoryRef].name;	 // set to correct name as defined in model
-						break; // no further searching necessary - break out of loop (performance boost)
-					}
-				}
-				if (mainType !== '') { // no further searching necessary - break out of loop (performance boost)
-					break;
-				}
+			// if type is already in correct format (i.e. called from favourites menu)
+			if (typeof favourite.type === 'string') {
+				self.toggleFavourite(favourite.name, favourite.key, favourite.type);
 			}
 
-			if (mainType === '') {
-				mainType = model.Other.name;
+			else {
+				var mainType = self.getType(favourite.type); // used for type category as listed in model
+				self.toggleFavourite(favourite.name, favourite.key, mainType);
 			}
-
-			self.toggleFavourite(favourite.name, favourite.key, mainType);
+			
 		};
 
 		// toggles whether a place is included in model.favouriteList
@@ -387,9 +377,27 @@ function mapApp() {
 
 		self.toggleTwitter = function() {
 			twitterView.search(11, function(result) { // callback function - executes when Twitter data returned
-				console.log(result);
 				mapView.createTwitterMarkers(result);
 			});
+		};
+
+		// ======== Helper function to get main business type (for marker icons) ========
+
+		// need to pass Yelp array of types (returned by main API call)
+		self.getType = function(typeArray) {
+			// break out of both loops if match found
+			for (var i = 0; i < typeArray.length; i++) {  // loop through categories in specific place object returned
+				for (var categoryRef in model.iconLibrary) { // loop through outer iconLibrary object
+					for (var j = 0; j < model.iconLibrary[categoryRef].yelpRefs.length; j++) { // loop through yelp categories array
+						if (typeArray[i][1] === model.iconLibrary[categoryRef].yelpRefs[j]) { // if specific place category matches iconLibrary category
+							return model.iconLibrary[categoryRef].name;
+						}
+					}
+				}
+			}
+
+			// if match not found, set to default symbol
+			return model.Other.name;
 		};
 
 		// ======== Error handling ========
@@ -451,8 +459,6 @@ function mapApp() {
 
 			var self = this;
 
-			console.log(place);
-
 			// remove any pre-existing animation: takes out bug where markers can get stuck in infinite loop
 			for (var k = 0; k < appViewModelContainer.viewModelMarkers().length; k++) {
 
@@ -462,33 +468,14 @@ function mapApp() {
 				}
 			}
 
-			self.type; // place type as per definitions in model
-			self.iconURL = '';
+			// place type as per definitions in model
+			self.type = appViewModelContainer.getType(place.categories);
 
-			// loop through Yelp object categories and match to matrix of images in model
-			// break out of both loops if match found
-			for (var i = 0; i < place.categories.length; i++) {  // loop through categories in specific place object returned
-				for (var categoryRef in model.iconLibrary) { // loop through outer iconLibrary object
-					for (var j = 0; j < model.iconLibrary[categoryRef].yelpRefs.length; j++) { // loop through yelp categories array
-						if (place.categories[i][1] === model.iconLibrary[categoryRef].yelpRefs[j]) { // if specific place category matches iconLibrary category
-							self.type = model.iconLibrary[categoryRef].name;
-							self.iconURL = model.iconLibrary[categoryRef]; // prepare to set to correct icon
-							break; // no further searching necessary - break out of loop (performance boost)
-						}
-					}
-					if (self.iconURL !== '') { // no further searching necessary - break out of loop (performance boost)
-						break;
-					}
-				}
-				if (self.iconURL !== '') { // no further searching necessary - break out of loop (performance boost)
-					break;
-				}
-			}
+			// prepare to set to correct icon
+			self.iconURL = model.iconLibrary[self.type];
 
-			// if match not found, set to default symbol
-			if (self.iconURL === '') {
-				self.type = model.Other.name;
-				self.iconURL = model.Other; // prepare to set to correct icon
+			if (!self.iconURL) {
+				self.iconURL = model.Other;
 			}
 
 			// set to white or black depending on whether in favourites array
@@ -560,7 +547,6 @@ function mapApp() {
 				appViewModelContainer.infoWindowPlaceContent.type = self.type;
 
 				// set infoWindow content - includes binding to trigger template
-				console.log(content);
 				mapView.infoWindow.setContent(content);
 
 				// show actual infoWindow
