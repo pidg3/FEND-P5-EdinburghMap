@@ -279,8 +279,6 @@ function mapApp() {
 		// also need to get 'type' into one of required categories (so toggleFavourite can update marker image)
 		self.menuFavourite = function(favourite) {
 
-			console.log(favourite);
-
 			// if type is already in correct format (i.e. called from favourites menu)
 			if (typeof favourite.type === 'string') {
 				self.toggleFavourite(favourite.name, favourite.key, favourite.type);
@@ -315,7 +313,7 @@ function mapApp() {
 				}
 			}
 
-			// if it is: remove object and set image to black
+			// if it is in favourites array: remove object and set image to black
 			if (favIndex !== null) { // if value set i.e. already in favourites
 				self.viewModelFavourites().splice(favIndex, 1); // delete object
 				if (markerIndex !== null) {
@@ -328,7 +326,7 @@ function mapApp() {
 				}
 			}
 
-			// if it isn't: add new object and set image to white
+			// if it isn't: add new object, set image to white and call marker
 			else {
 				var newFavourite = {
 					key: ID,
@@ -344,6 +342,7 @@ function mapApp() {
 						self.viewModelMarkers()[markerIndex][ID].setIcon(model.Other.imgFav);
 					}
 				}
+				self.placeClick(ID);
 			}
 
 			self.viewModelFavourites.valueHasMutated(); // force update of CSS for stars to change colour
