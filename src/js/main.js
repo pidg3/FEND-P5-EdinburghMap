@@ -295,6 +295,8 @@ function mapApp() {
 		// MUST pass in name, ID and type strings, in that order
 		self.toggleFavourite = function(name, ID, type) {
 
+			console.log(ID);
+
 			// work out if key already in favourites array
 			var favIndex = null;
 			for (var i = 0; i < self.viewModelFavourites().length; i++) { // loop through favourites array
@@ -589,7 +591,8 @@ function mapApp() {
 			// remove any pre-existing animation: takes out bug where markers can get stuck in infinite loop
 			for (var k = 0; k < appViewModelContainer.viewModelMarkers().length; k++) {
 
-				// there will only ever be one pair of object values, however this allows key and value to be separated
+				// there will only ever be one pair of object values, however this allows key and value to be separated ...
+				// ... value is marker object itself so needs to be accessed directly
 				for (var refMarker in appViewModelContainer.viewModelMarkers()[k]) {
 					appViewModelContainer.viewModelMarkers()[k][refMarker].setAnimation(null); // reset animation
 				}
@@ -600,7 +603,6 @@ function mapApp() {
 
 			// prepare to set to correct icon
 			self.iconURL = model.iconLibrary[self.type];
-
 			if (!self.iconURL) {
 				self.iconURL = model.Other;
 			}
@@ -667,8 +669,11 @@ function mapApp() {
 				appViewModelContainer.infoWindowPlaceContent.mapLink = 'http://maps.google.com/?q=' + place.name + ',Edinburgh';
 				appViewModelContainer.infoWindowPlaceContent.address = place.location.address;
 
-				appViewModelContainer.infoWindowPlaceContent.ID = place.id; // not used for window but needed for favourite functionality
-				appViewModelContainer.infoWindowPlaceContent.type = self.type;
+				// not used for window but needed for favourite functionality
+				appViewModelContainer.infoWindowPlaceContent.ID = place.id;
+				appViewModelContainer.infoWindowPlaceContent.type = appViewModelContainer.getType(place.categories);
+
+				console.log(appViewModelContainer.infoWindowPlaceContent.type);
 
 				// set infoWindow content - includes binding to trigger template
 				mapView.infoWindow.setContent(content);
