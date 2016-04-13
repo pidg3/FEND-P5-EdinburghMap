@@ -20,6 +20,8 @@ The idea is:
 * **NOTE - on this branch secret keys for Yelp API calls are included, to make the Udacity Review a bit easier :-) This is not the same in the prod version**
 * Run `npm install` to install required node modules for build process
 * `gulp build` is used to clear dist directory and rebuild from src directory if any change are made.
+* In the root directory, run a local HTTP server e.g. a python server: `python -m SimpleHTTPServer 8000`. This is required for the API calls. 
+* Navigate to localhost path, localhost:8000 in the above example.
 
 ## MV* strategy
 
