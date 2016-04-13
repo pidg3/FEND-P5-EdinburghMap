@@ -53,7 +53,7 @@ gulp.task('js', function() {
 		)
 		.pipe(concat('all-js.min.js'))
 		.pipe(stripDebug())
-		.pipe(uglify())
+		//.pipe(uglify())
 		.pipe(gulp.dest('dist/js/'));
 });
 

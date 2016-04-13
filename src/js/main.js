@@ -777,7 +777,6 @@ function mapApp() {
 			}
 		},
 
-
 		animateMarker: function(marker) {
 			marker.setAnimation(google.maps.Animation.BOUNCE); // start animation
 			setTimeout(function(){ marker.setAnimation(null); }, 750); // animations plays once only
@@ -815,7 +814,6 @@ function mapApp() {
 		}
 	};
 
-
 	/***********************************
 
 	YELP API
@@ -824,23 +822,55 @@ function mapApp() {
 
 	// all Yelp API calls
 	// as a design principle data is NOT processed/parsed here but instead raw JSON return passed to other functions
-	// API calls made via a PHP handler
 
 	var yelpView = {
+
+		// credit for API call: Udacity forums - https://discussions.udacity.com/t/how-to-make-ajax-request-to-yelp-api/13699/18
+
+		// this is not a secure implementation as keys are visible to all
+		// TODO - hide using server side code
+
+		yelpAPI: {
+			YELP_KEY_SECRET: 'sWaoF5jHGhP3lrRobEOhgBpYq80',
+			YELP_TOKEN_SECRET: 'Jv-ro8dN-hapeEgoQ2eDONFwSe8'
+		},
+
+		nonce_generate: function() { // generates random string as per Yelp OAuth spec
+			return Math.floor(Math.random() * 1e12).toString();
+		},
+
+		commonParameters: {
+			oauth_consumer_key: 'VysIcTbiC1NAl7xLTDqCrA',
+			oauth_token: 'hMkJBkzArp4mh4R6bP3hRjhgfF4sZ92_',
+			oauth_signature_method: 'HMAC-SHA1',
+			oauth_version : '1.0',
+			callback: 'cb',
+			location : 'Edinburgh'
+		},
 
 		// functions need to be called using callback to 'do something' with the result
 		// this avoids issues due to async AJAX request
 
 		get_business: function(ID, callback) { // search by specific ID - must match exactly
 
+			var IDParameters = {
+				oauth_timestamp: Math.floor(Date.now()/1000) // generated with each request to avoid timeout issues (300 second limit)
+			};
+
+			var IDUrl = 'https://api.yelp.com/v2/business/' + ID;
+
+			$.extend(IDParameters, this.commonParameters);
+
+			IDParameters.oauth_nonce = this.nonce_generate(); // must be before signature generated otherwise will return 400 error
+
+			var encodedSignature = oauthSignature.generate('GET', IDUrl, IDParameters, this.yelpAPI.YELP_KEY_SECRET, this.yelpAPI.YELP_TOKEN_SECRET);
+			IDParameters.oauth_signature = encodedSignature;
+
 			var ajaxParameters = {
-				type: 'POST', // needs to be POST so can pass data values
-				url:'php/yelp.php',
-				data: {
-					type: 'get_business', // 'search' or 'get_business'
-					businessID: ID
-				},
-				dataType:'JSON',
+				url: IDUrl,
+				data: IDParameters,
+				cache: true,                // crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
+				dataType: 'jsonp',
 				success: callback
 			};
 
@@ -854,48 +884,31 @@ function mapApp() {
 
 		search: function(query, callback) { // search for 'anything' - place name, type etc
 
+			var typeParameters = {
+				term : query, // search for query passed to searchAll
+				limit: 6,
+				oauth_timestamp: Math.floor(Date.now()/1000) // generated with each request to avoid timeout issues (300 second limit)
+			};
+
+			$.extend(typeParameters, this.commonParameters);
+
+			typeParameters.oauth_nonce = this.nonce_generate(); // must be before signature generated otherwise will return 400 error
+
+			var encodedSignature = oauthSignature.generate('GET', 'https://api.yelp.com/v2/search', typeParameters, this.yelpAPI.YELP_KEY_SECRET, this.yelpAPI.YELP_TOKEN_SECRET);
+			typeParameters.oauth_signature = encodedSignature;
+
 			var ajaxParameters = {
-				type: 'POST', // needs to be POST so can pass data values
-				url:'php/yelp.php',
-				data: {
-					type: 'search', // 'search' or 'get_business'
-					term: query
-				},
-				dataType:'JSON',
+				url: 'https://api.yelp.com/v2/search',
+				data: typeParameters,
+				cache: true,                // crucial to include as well to prevent jQuery from adding on a cache-buster parameter '_=23489489749837', invalidating our oauth-signature
+				dataType: 'jsonp',
 				success: callback
 			};
 
 			// Send AJAX query via jQuery library.
-			$.ajax(ajaxParameters) // return to be parsed by other function - API call only here
+			$.ajax(ajaxParameters)
 			.error(function(){
 				appViewModelContainer.errorHandler('The Yelp API is misbehaving.'); // error handling
-			});
-		}
-	};
-
-	/***********************************
-
-	TWITTER API
-
-	***********************************/
-
-	var twitterView = {
-		search: function(number, callback) { // search by specific ID - must match exactly
-
-			var ajaxParameters = {
-				type: 'POST', // needs to be POST so can pass data values
-				url:'php/twitter.php',
-				data: {
-					number: number // number of results to return
-				},
-				dataType:'JSON',
-				success: callback
-			};
-
-			// Send AJAX query via jQuery library.
-			$.ajax(ajaxParameters) // return to be parsed by other function - API call only here
-			.error(function(){
-				appViewModelContainer.errorHandler('The Twitter API has temporarily flown away.'); // error handling
 			});
 		}
 	};

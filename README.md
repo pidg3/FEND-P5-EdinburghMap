@@ -4,22 +4,22 @@ Hosted version here: http://michaelpidgeon.co.uk/mapapp
 
 This project is for the Udacity Front End Nanodegree.
 
-**Data from the Yelp and Twitter APIs are used.**
+**Data from the Yelp is used.**
+
+I have removed all PHP code from this project as per Udacity review request. This means it is not a secure implementation, and the secret keys for Yelp are visible to all.
 
 The idea is:
 
-1. To allow the user to get a sense of cool places (Yelp) and cool things (Twitter) going on in Edinburgh.
+1. To allow the user to get a sense of cool places (Yelp) in Edinburgh.
 2. To allow the user to save a list of 'favourite places' that will persist over time (currently via localStorage only).
 3. To give me a bit of practice in RESTful API calls, Google maps and learning new JS frameworks.
 
 ## Instructions to run/edit the application locally
 
 * Clone the repository as usual
-* Make sure PHP/cURL installed (`sudo apt-get install php` and `sudo apt-get install php5-curl`) and set up local host in the root directory: `php -S localhost:8000`
-* Secret keys for Yelp and Twitter are not included in the repo to make the application secure. These will need to be added using your own application keys. Two new files need to be added the dist/php folder: yelp-keys.php and twitter-keys.php. These are simply containers for the API keys: the exact format required is described in yelp.php and twitter.php respectively.
-* **NOTE - on this branch secret keys are included, to make the Udacity Review a bit easier :-)**
+* **NOTE - on this branch secret keys for Yelp API calls are included, to make the Udacity Review a bit easier :-) This is not the same in the prod version**
 * Run `npm install` to install required node modules for build process
-* `gulp build` is used to clear dist directory and rebuild from src directory.
+* `gulp build` is used to clear dist directory and rebuild from src directory if any change are made.
 
 ## MV* strategy
 
@@ -29,7 +29,6 @@ KnockoutJS used as framework as per Udacity project rubric. JS  divided into fiv
 2. appViewModel. Standard KnockoutJS ViewModel. Function rather than object as per specification. Binds everything together, including the DOM.
 3. mapView. Everything to do with Google Maps API calls.
 4. yelpView. Everything to do with Yelp API calls.
-5. twitterView. Everything to do with Twitter calls.
 
 ## Known issues
 
@@ -38,5 +37,4 @@ KnockoutJS used as framework as per Udacity project rubric. JS  divided into fiv
 ## Notes and credits
 
 * I had to remove the initial dozen or so commits from the history.
-* PHP code to call Yelp API courtesy of: https://github.com/Yelp/yelp-api/tree/master/v2/php
-* PHP code to call Twitter API courtesy of: https://github.com/J7mbo/twitter-api-php
+* oauth-signatures for Yelp calls: https://github.com/bettiolo/oauth-signature-js

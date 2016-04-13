@@ -73,7 +73,6 @@
 	<div class="top-bar">
 		<i data-bind="click: function(data, event) { toggleMenuState('menu') }" id="toggle-menu" class="fa fa-bars fa-3x"></i>
 		<i data-bind="click: function(data, event) { toggleMenuState('favourites') }" id="toggle-favourites" class="fa fa-star fa-3x"></i>
-		<i data-bind="click: toggleTwitter" id="toggle-twitter" class="fa fa-twitter fa-3x"></i>
 
 		<div class="search-container">
 			<form data-bind="submit: searchBox" id="search-box">
@@ -114,15 +113,6 @@
 		<img class="info-yelp" src="images/yelp_powered_btn_dark.png" ></img>
 	</script>
 
-	<!-- ======== Map InfoWindow twitter template ======== -->
-
-	<script type="text/html" id="infoWindow-twitter">
-		<h4 class="twitter-name" data-bind="text: screenName"></h4>
-		<img class="twitter-image" data-bind="attr: { src: imgURL }" alt="Twitter thumbnail"></img>
-		<p class="twitter-copy" data-bind="text: copy"></p>
-		<p class="twitter-attribution">Data from Twitter API</p>
-	</script>
-
 	<!-- build:js js/all-js.min.js -->
 
 	<!-- jQuery scripts (Ajax calls only)-->
@@ -130,6 +120,9 @@
 
 	<!-- Lodash scripts -->
 	<script src="bower_components/lodash/dist/lodash.core.min.js"></script>
+
+	<!-- Required to generate oAuth signatre for Yelp -->
+	<script src="bower_components/oauth-signature/dist/oauth-signature.js"></script>
 
 	<!-- Knockout scripts and customn bindings-->
 	<script src="bower_components/knockout/dist/knockout.js"></script>
